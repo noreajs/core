@@ -1,0 +1,24 @@
+{
+  "name": "core",
+  "version": "1.0.0",
+  "description": "Nore.Js is a framework for building scalable Node.js serve applications. Is is built with Typescript and use Express as web framework.",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lambou/norejs-core.git"
+  },
+  "keywords": [
+    "norejs",
+    "rest",
+    "framework"
+  ],
+  "author": "Arnold Lambou",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lambou/norejs-core/issues"
+  },
+  "homepage": "https://github.com/lambou/norejs-core#readme"
+}
