@@ -1,6 +1,6 @@
 import { Router, IRoute } from "express";
 
-export default class NoreRouter {
+export default class NoreaRouter {
     private prefix: string;
     private router: Router;
 

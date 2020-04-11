@@ -1,5 +1,5 @@
 import express, { NextFunction } from "express";
-import NoreRouter from './NoreRouter';
+import NoreaRouter from './NoreaRouter';
 
 /**
  * Group many routes to a single block
@@ -7,7 +7,7 @@ import NoreRouter from './NoreRouter';
  * @param middlewares group middlewares
  * @param routes group routes
  */
-export default function group(prefix: string, middlewares: NextFunction[], routes: (router: NoreRouter) => void) {
+export default function group(prefix: string, middlewares: NextFunction[], routes: (router: NoreaRouter) => void) {
     const expressRouter = express.Router();
 
     // add middlewares to router
@@ -17,7 +17,7 @@ export default function group(prefix: string, middlewares: NextFunction[], route
     }
 
     // define routes
-    routes(new NoreRouter(expressRouter, prefix));
+    routes(new NoreaRouter(expressRouter, prefix));
 
     return expressRouter;
 }
