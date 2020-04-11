@@ -1,7 +1,7 @@
 {
-  "name": "@norejs/core",
+  "name": "@noreajs/core",
   "version": "1.0.0",
-  "description": "Nore.Js is a framework for building scalable Node.js server applications. Is is built with Typescript and use Express as web framework.",
+  "description": "Norea.Js is a framework for building scalable Node.js server applications. Is is built with Typescript and use Express as web framework.",
   "main": "dist/index.js",
   "scripts": {
     "start": "tsc && node dist/index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lambou/norejs-core.git"
+    "url": "https://github.com/ovnicode/noreajs-core.git"
   },
   "keywords": [
     "norejs",
@@ -19,9 +19,9 @@
   "author": "Ovnicode",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lambou/norejs-core/issues"
+    "url": "https://github.com/ovnicode/noreajs-core/issues"
   },
-  "homepage": "https://github.com/lambou/norejs-core#readme",
+  "homepage": "https://github.com/ovnicode/noreajs-core/blob/master/README.md",
   "devDependencies": {
     "tslint": "^5.20.1",
     "typescript": "^3.7.4"
