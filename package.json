@@ -1,5 +1,5 @@
 {
-  "name": "core",
+  "name": "@norejs/core",
   "version": "1.0.0",
   "description": "Nore.Js is a framework for building scalable Node.js serve applications. Is is built with Typescript and use Express as web framework.",
   "main": "dist/index.js",
@@ -16,7 +16,7 @@
     "rest",
     "framework"
   ],
-  "author": "Arnold Lambou",
+  "author": "Ovnicode",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/lambou/norejs-core/issues"
@@ -25,5 +25,11 @@
   "devDependencies": {
     "tslint": "^5.20.1",
     "typescript": "^3.7.4"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.17.6",
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
   }
 }
