@@ -1,8 +1,7 @@
 import app from "./lib/app";
-import * as http from 'http';
-import * as https from 'http';
-import group from './lib/routes/group';
-import NoreaRouter from './lib/routes/NoreaRouter';
+import http from 'http';
+import https from 'http';
+import * as route from './lib/route';
 
 const PORT = process.env.PORT || 3000;
 
@@ -15,9 +14,6 @@ server.listen(PORT, () => {
     console.log('Express server listening on port ' + PORT);
 })
 
-module.exports = {
-    route: {
-        group,
-        NoreaRouter
-    }
-}
+export default {
+    route
+};

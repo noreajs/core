@@ -1,9 +1,8 @@
 import { Application, Request, Response } from "express"
-import group from "./routes/group";
-
+import group from "./route/group";
 export default class Routes {
     public routes(app: Application): void {
-        
+
         app.use(group('/api/v1', [], (router) => {
             /**
              * Login
@@ -26,6 +25,6 @@ export default class Routes {
     }
 
     public middlewares(app: Application): void {
-        
+
     }
 }

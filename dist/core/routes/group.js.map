@@ -1,1 +1,0 @@
-{"version":3,"file":"group.js","sourceRoot":"","sources":["../../../src/core/routes/group.ts"],"names":[],"mappings":";;;;;AAAA,sDAA+C;AAC/C,8DAAsC;AAEtC,SAAwB,KAAK,CAAC,MAAc,EAAE,UAAyC,EAAE,MAAoC;IACzH,MAAM,aAAa,GAAG,iBAAO,CAAC,MAAM,EAAE,CAAC;IACvC,gBAAgB;IAChB,MAAM,CAAC,IAAI,oBAAU,CAAC,aAAa,EAAE,MAAM,CAAC,CAAC,CAAC;IAE9C,OAAO,aAAa,CAAC;AACzB,CAAC;AAND,wBAMC"}
