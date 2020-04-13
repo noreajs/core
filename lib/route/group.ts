@@ -6,7 +6,7 @@ import NoreaRouter from "./NoreaRouter";
  * @param prefix group prefix
  * @param middlewares group middlewares
  * @param routes group routes
-    */
+*/
 export default function group(prefix: string, middlewares: NextFunction[], routes: (router: NoreaRouter) => void) {
     const expressRouter = express.Router();
 

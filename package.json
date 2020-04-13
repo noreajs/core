@@ -4,7 +4,7 @@
   "description": "Norea.Js is a framework for building scalable Node.js server applications. Is is built with Typescript and use Express as web framework.",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && node dist/index.js",
+    "start": "tsc && node dist/run.js",
     "test": "echo \"No test specified\""
   },
   "repository": {
