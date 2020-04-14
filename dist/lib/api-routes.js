@@ -1,12 +1,10 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const group_1 = __importDefault(require("./route/group"));
+// import group from "./route/group";
+const __1 = require("..");
 class Routes {
     routes(app) {
-        app.use(group_1.default('/api/v1', [], (router) => {
+        app.use(__1.group('/api/v1', [(req, res, next) => { next(); }], (router) => {
             /**
              * Login
              */

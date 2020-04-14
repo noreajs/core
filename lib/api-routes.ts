@@ -5,7 +5,7 @@ import {group} from '..';
 export default class Routes {
     public routes(app: Application): void {
 
-        app.use(group('/api/v1', [(req: Request, res: Response, next: Function) => {}], (router) => {
+        app.use(group('/api/v1', [(req: Request, res: Response, next: Function) => {next()}], (router) => {
             /**
              * Login
              */
