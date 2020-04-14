@@ -19,3 +19,8 @@ declare interface NoreaRouter {
      */
     route(path: string): IRoute;
 }
+
+export {
+    group,
+    NoreaRouter
+}
