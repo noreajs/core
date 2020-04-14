@@ -1,5 +1,4 @@
 import express from "express";
-import core from "express-serve-static-core";
 import NoreaRouter from "./NoreaRouter";
 
 /**
@@ -8,13 +7,13 @@ import NoreaRouter from "./NoreaRouter";
  * @param middlewares group middlewares
  * @param routes group routes
 */
-const group = function (prefix: string, middlewares: express.RequestHandler<core.ParamsDictionary, any, any, core.Query>[], routes: (router: NoreaRouter) => void) {
+const group = function (prefix: string, middlewares: Function[], routes: (router: NoreaRouter) => void) {
     const expressRouter = express.Router();
 
     // add middlewares to router
 
     if (middlewares.length != 0) {
-        expressRouter.use(middlewares)
+        expressRouter.use(middlewares as any)
     }
 
     // define routes
