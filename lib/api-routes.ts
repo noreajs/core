@@ -1,11 +1,10 @@
-import { Application, Request, Response } from "express"
-// import group from "./route/group";
-import {group} from '..';
+import NoreaAppRoutes from "./route/NoreaAppRoutes";
+import group from "./route/group";
+import { Request, Response } from "express";
 
-export default class Routes {
-    public routes(app: Application): void {
-
-        app.use(group('/api/v1', [(req: Request, res: Response, next: Function) => {next()}], (router) => {
+export default new NoreaAppRoutes({
+    routes: (app) => {
+        app.use(group('/api/v1', [(req: Request, res: Response, next: Function) => { next() }], (router) => {
             /**
              * Login
              */
@@ -24,9 +23,8 @@ export default class Routes {
                 })
             })
         }));
-    }
+    },
+    middlewares: (app) => void {
 
-    public middlewares(app: Application): void {
-
     }
-}
+}) 

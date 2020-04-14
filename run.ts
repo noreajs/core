@@ -1,14 +1,18 @@
-import app from "./lib/app";
-import http from 'http';
-import https from 'http';
+import { NoreaApp } from "./lib/NoreaApp";
+import apiRoutes from "./lib/api-routes";
 
-const PORT = process.env.PORT || 3000;
-
-// create server
-const server = new (process.env.NODE_ENV ? https.Server : http.Server)(app);
-
-
-server.listen(PORT, () => {
-    console.log(`Environement : ${process.env.NODE_ENV || 'local'}`);
-    console.log('Express server listening on port ' + PORT);
+/**
+ * Create a new NoreaJs App
+ */
+const app = new NoreaApp(apiRoutes, {
+    forceHttps: false,
+    beforeStart: (app) => { },
+    afterStart: (app, server) => {
+        console.log('App started')
+    }
 })
+
+/**
+ * Start your app
+ */
+app.start(3000)
