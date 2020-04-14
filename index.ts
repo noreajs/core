@@ -1,7 +1,3 @@
-import group from './lib/route/group';
-import NoreaRouter from './lib/route/NoreaRouter';
+export const group = require('./lib/route/group');
 
-export {
-    group,
-    NoreaRouter
-}
+export const NoreaRouter = require('./lib/route/NoreaRouter');

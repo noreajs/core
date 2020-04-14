@@ -7,12 +7,12 @@ import { Router } from "express";
  * @param middlewares group middlewares
  * @param routes group routes
 */
-export function group(prefix: string, middlewares: NextFunction[], routes: (router: NoreaRouter) => void): Router;
+declare function group(prefix: string, middlewares: NextFunction[], routes: (router: NoreaRouter) => void): Router;
 
 /**
  * Norea router
  */
-export class NoreaRouter {
+declare interface NoreaRouter {
     /**
      * Add prefix path to the given route path and return the route instance
      * @param path route path

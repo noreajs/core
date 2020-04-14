@@ -3,7 +3,7 @@ import { Router, IRoute } from "express";
 /**
  * Norea router
  */
-export default class NoreaRouter {
+class NoreaRouter {
     private prefix: string;
     private router: Router;
 
@@ -20,3 +20,7 @@ export default class NoreaRouter {
         return this.router.route(`${this.prefix}${path}`)
     }
 }
+
+module.exports = NoreaRouter;
+
+export default NoreaRouter;

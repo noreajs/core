@@ -1,5 +1,6 @@
 import { Application, Request, Response } from "express"
 import group from "./route/group";
+
 export default class Routes {
     public routes(app: Application): void {
 
