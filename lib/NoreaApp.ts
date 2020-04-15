@@ -20,6 +20,8 @@ export type InitMethods = {
      * This method is executed during the initialization of the application.
      * It is in this method that external packages are initialized.
      * 
+     *  @param {express.Application} app Express application
+     * 
      * Example:
      * 
      * ```
@@ -41,6 +43,10 @@ export type InitMethods = {
     /**
      * This method is executed after the application has started.
      * 
+     *  @param {express.Application} app express application
+     *  @param {https.Server | http.Server} server server
+     *  @param {number} port application port
+     * 
      * Example:
      * 
      * ```
@@ -53,8 +59,9 @@ export type InitMethods = {
      *     },
      * });
      * ```
+     * 
      */
-    afterStart: (app: express.Application, server: https.Server | http.Server) => void | undefined
+    afterStart: (app: express.Application, server: https.Server | http.Server, port: number) => void | undefined
 }
 
 /**
@@ -130,7 +137,7 @@ export class NoreaApp {
         server.listen(PORT, () => {
             // call after start callback
             if (this.init.afterStart) {
-                this.init.afterStart(this.app, server);
+                this.init.afterStart(this.app, server, Number(PORT));
             } else {
                 console.log('NOREA API');
                 console.log('====================================================');
