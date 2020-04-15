@@ -1,6 +1,6 @@
 {
   "name": "@noreajs/core",
-  "version": "1.0.10-0",
+  "version": "1.0.10-1",
   "description": "Norea.Js is a framework for building scalable Node.js server applications. Is is built with Typescript and use Express as web framework.",
   "main": "dist/index.js",
   "scripts": {
