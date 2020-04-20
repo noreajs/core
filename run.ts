@@ -7,8 +7,9 @@ import apiRoutes from "./lib/api-routes";
 const app = new NoreaApp(apiRoutes, {
     forceHttps: false,
     beforeStart: (app) => { },
-    afterStart: (app, server) => {
-        console.log('App started')
+    afterStart: (app, server, port) => {
+        console.log('App started'),
+        console.log('Your app is running on port', port)
     }
 })
 
