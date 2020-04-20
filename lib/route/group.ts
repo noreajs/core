@@ -7,7 +7,7 @@ import NoreaRouter from "./NoreaRouter";
  * @param middlewares group middlewares
  * @param routes group routes
 */
-const group = function (prefix: string, middlewares: Function[], routes: (router: NoreaRouter) => void) {
+const group = function (middlewares: Function[], routes: (router: NoreaRouter) => void) {
     const expressRouter = express.Router();
 
     // add middlewares to router
@@ -17,7 +17,7 @@ const group = function (prefix: string, middlewares: Function[], routes: (router
     }
 
     // define routes
-    routes(new NoreaRouter(expressRouter, prefix));
+    routes(new NoreaRouter(expressRouter));
 
     return expressRouter;
 }

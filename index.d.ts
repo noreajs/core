@@ -6,7 +6,7 @@ import express from "express";
  * @param middlewares group middlewares
  * @param routes group routes
 */
-declare function group(prefix: string, middlewares: Function[], routes: (router: NoreaRouter) => void): express.Router;
+declare function group(middlewares: Function[], routes: (router: NoreaRouter) => void): express.Router;
 
 /**
  * Norea router

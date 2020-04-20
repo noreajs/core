@@ -4,12 +4,10 @@ import { Router, IRoute } from "express";
  * Norea router
  */
 class NoreaRouter {
-    private prefix: string;
     private router: Router;
 
-    constructor(router: Router, prefix?: string) {
+    constructor(router: Router) {
         this.router = router;
-        this.prefix = prefix || '';
     }
 
     /**
@@ -17,7 +15,7 @@ class NoreaRouter {
      * @param path route path
      */
     route(path: string): IRoute {
-        return this.router.route(`${this.prefix}${path}`)
+        return this.router.route(`${path}`)
     }
 }
 

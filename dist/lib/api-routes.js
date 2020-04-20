@@ -7,7 +7,11 @@ const NoreaAppRoutes_1 = __importDefault(require("./route/NoreaAppRoutes"));
 const group_1 = __importDefault(require("./route/group"));
 exports.default = new NoreaAppRoutes_1.default({
     routes: (app) => {
-        app.use(group_1.default('/api/v1', [(req, res, next) => { next(); }], (router) => {
+        app.use('/api/v1', group_1.default([(req, res, next) => {
+                return res.status(401).json({
+                    message: 'You are not allowed to access to this service'
+                });
+            }], (router) => {
             /**
              * Login
              */
@@ -25,6 +29,11 @@ exports.default = new NoreaAppRoutes_1.default({
                 });
             });
         }));
+        app.route('/dashboard').get((req, res) => {
+            res.status(200).send({
+                message: 'Welcome home'
+            });
+        });
     },
     middlewares: (app) => void {}
 });
