@@ -26,11 +26,11 @@
     "tslint": "^5.20.1",
     "typescript": "^3.7.4",
     "@types/cors": "^2.8.6",
-    "@types/express": "^4.17.6"
+    "@types/express": "^4.17.6",
+    "np": "^6.2.1"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "np": "^6.2.1"
+    "express": "^4.17.1"
   }
 }
