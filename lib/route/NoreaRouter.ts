@@ -4,7 +4,7 @@ import { Router, IRoute } from "express";
  * Norea router
  */
 class NoreaRouter {
-    private router: Router;
+    router: Router;
 
     constructor(router: Router) {
         this.router = router;
