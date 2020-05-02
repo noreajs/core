@@ -8,7 +8,9 @@ import NoreaRouter from "./NoreaRouter";
  * @param routes group routes
 */
 const group = function (middlewares: Function[], routes: (router: NoreaRouter) => void) {
-    const expressRouter = express.Router();
+    const expressRouter = express.Router({
+        mergeParams: true
+    });
 
     // add middlewares to router
 
