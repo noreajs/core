@@ -9,7 +9,7 @@
     "/index.d.ts"
   ],
   "scripts": {
-    "start": "tsc && node dist/run.js",
+    "start": "tsc && node dist/test-server/run.js",
     "test": "echo \"No test specified\""
   },
   "repository": {
