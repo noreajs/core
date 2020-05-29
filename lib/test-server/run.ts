@@ -1,5 +1,5 @@
-import { NoreaApp } from "../lib/NoreaApp";
 import apiRoutes from "./api-routes";
+import { NoreaApp } from "../NoreaApp";
 
 /**
  * Create a new NoreaJs App

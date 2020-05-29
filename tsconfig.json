@@ -1,4 +1,5 @@
 {
+    "include": ["lib/**/*"],
     "compilerOptions": {
         "module": "commonjs",
         "esModuleInterop": true,
@@ -6,11 +7,5 @@
         "moduleResolution": "node",
         "sourceMap": false,
         "outDir": "dist"
-    },
-    "lib": [
-        "es2015"
-    ],
-    "exclude": [
-        "**/*.d.ts"
-    ]
+    }
 }

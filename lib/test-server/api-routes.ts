@@ -1,6 +1,6 @@
-import NoreaAppRoutes from "../lib/route/NoreaAppRoutes";
-import group from "../lib/route/group";
 import { Request, Response } from "express";
+import { NoreaAppRoutes } from "..";
+import group from "../route/group";
 
 export default new NoreaAppRoutes({
     routes: (app) => {
