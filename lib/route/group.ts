@@ -24,6 +24,4 @@ const group = function (middlewares: Function[], routes: (router: NoreaRouter) =
     return expressRouter;
 }
 
-module.exports = group;
-
 export default group;

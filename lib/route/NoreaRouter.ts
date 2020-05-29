@@ -19,6 +19,4 @@ class NoreaRouter {
     }
 }
 
-module.exports = NoreaRouter;
-
 export default NoreaRouter;

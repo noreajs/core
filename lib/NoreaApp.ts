@@ -8,7 +8,7 @@ import NoreaAppRoutes from "./route/NoreaAppRoutes";
 /**
  * Norea.Js app initialisation's parameter type
  */
-export type InitMethods = {
+export type NoreaAppInitMethods = {
     /**
      * Force app to run on https,
      * false as default value is recommended when the app is running localy.
@@ -82,9 +82,9 @@ export class NoreaApp {
     /**
      * Initialization parameters
      */
-    private init: InitMethods;
+    private init: NoreaAppInitMethods;
 
-    constructor(routes: NoreaAppRoutes, init: InitMethods) {
+    constructor(routes: NoreaAppRoutes, init: NoreaAppInitMethods) {
         this.app = express();
         this.routes = routes;
         this.init = init;

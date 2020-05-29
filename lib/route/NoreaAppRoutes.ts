@@ -3,7 +3,7 @@ import express from 'express';
 /**
  * Type of parameter used to initialize the initializer of the application routes......., yes you get it
  */
-type InitMethods = {
+export type NoreaAppRoutesInitMethods = {
     /**
      * Filters that are applied before the application routes
      */
@@ -30,7 +30,7 @@ export default class NoreaAppRoutes {
      */
     routes: (app: express.Application) => void;
 
-    constructor(init: InitMethods) {
+    constructor(init: NoreaAppRoutesInitMethods) {
         this.middlewares = init.middlewares;
         this.routes = init.routes;
     }
