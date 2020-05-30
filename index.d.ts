@@ -16,6 +16,24 @@ export function group(
   routes: (router: NoreaRouter) => void
 ): express.Router;
 
+export type RouteGroupParamsType = {
+  routerOptions?: express.RouterOptions;
+  middlewares?: core.RequestHandler<
+    core.ParamsDictionary,
+    any,
+    any,
+    core.Query
+  >[];
+  routes: (router: NoreaRouter) => void;
+};
+
+export class Route {
+  /**
+   * Group routes together to make it a module
+   * @param params group params
+   */
+  static group(params: RouteGroupParamsType): core.Router;
+}
 /**
  * Norea router
  */
