@@ -1,6 +1,7 @@
 import express from "express";
 import http from "http";
 import https from "https";
+import * as core from "express-serve-static-core";
 
 export { express, http, https };
 
@@ -18,17 +19,7 @@ export function group(
 /**
  * Norea router
  */
-export class NoreaRouter {
-  router: express.Router;
-
-  constructor(router: express.Router);
-
-  /**
-   * Add prefix path to the given route path and return the route instance
-   * @param path route path
-   */
-  route: (path: string) => express.IRoute;
-}
+export interface NoreaRouter extends core.Router { }
 
 /**
  * Type of parameter used to initialize the initializer of the application routes......., yes you get it

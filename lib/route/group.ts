@@ -1,27 +1,36 @@
-import express from "express";
 import NoreaRouter from "./NoreaRouter";
+import express from "express";
+import * as core from "express-serve-static-core";
 
 /**
  * Group many routes to a single block
  * @param prefix group prefix
  * @param middlewares group middlewares
  * @param routes group routes
-*/
-const group = function (middlewares: Function[], routes: (router: NoreaRouter) => void) {
-    const expressRouter = express.Router({
-        mergeParams: true
-    });
+ */
+function group(
+  middlewares: core.RequestHandler<
+  core.ParamsDictionary,
+    any,
+    any,
+    core.Query
+  >[],
+  routes: (router: NoreaRouter) => void
+): core.Router {
+  const expressRouter = express.Router({
+    mergeParams: true,
+  });
 
-    // add middlewares to router
+  // add middlewares to router
 
-    if (middlewares.length != 0) {
-        expressRouter.use(middlewares as any)
-    }
+  if (middlewares.length != 0) {
+    expressRouter.use(middlewares);
+  }
 
-    // define routes
-    routes(new NoreaRouter(expressRouter));
+  // define routes
+  routes(expressRouter);
 
-    return expressRouter;
+  return expressRouter;
 }
 
 export default group;
