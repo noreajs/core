@@ -1,6 +1,5 @@
 import NoreaRouter from "./NoreaRouter";
 import express from "express";
-import * as core from "express-serve-static-core";
 
 /**
  * Group many routes to a single block
@@ -9,14 +8,9 @@ import * as core from "express-serve-static-core";
  * @param routes group routes
  */
 function group(
-  middlewares: core.RequestHandler<
-  core.ParamsDictionary,
-    any,
-    any,
-    core.Query
-  >[],
+  middlewares: express.RequestHandler[],
   routes: (router: NoreaRouter) => void
-): core.Router {
+) {
   const expressRouter = express.Router({
     mergeParams: true,
   });

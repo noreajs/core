@@ -1,7 +1,6 @@
 import express from "express";
 import http from "http";
 import https from "https";
-import * as core from "express-serve-static-core";
 
 export { express, http, https };
 
@@ -18,12 +17,7 @@ export function group(
 
 export type RouteGroupParamsType = {
   routerOptions?: express.RouterOptions;
-  middlewares?: core.RequestHandler<
-    core.ParamsDictionary,
-    any,
-    any,
-    core.Query
-  >[];
+  middlewares?: express.RequestHandler[];
   routes: (router: NoreaRouter) => void;
 };
 
@@ -32,12 +26,12 @@ export class Route {
    * Group routes together to make it a module
    * @param params group params
    */
-  static group(params: RouteGroupParamsType): core.Router;
+  static group(params: RouteGroupParamsType): express.Router;
 }
 /**
  * Norea router
  */
-export interface NoreaRouter extends core.Router { }
+export interface NoreaRouter extends express.Router { }
 
 /**
  * Type of parameter used to initialize the initializer of the application routes......., yes you get it
