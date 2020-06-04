@@ -1,12 +1,12 @@
 {
   "name": "@noreajs/core",
   "version": "1.1.0-6",
-  "description": "Norea.Js is a framework for building scalable Node.js server applications. Is is built with Typescript and use Express as web framework.",
+  "description": "Norea.Js is a sets of tools for the development of API with Node.Js.",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
-    "/dist/route",
-    "/dist/NoreaApp.js",
-    "/index.d.ts"
+    "dist/route",
+    "dist/NoreaApp.js"
   ],
   "scripts": {
     "start": "tsc && node dist/test-server/run.js",
@@ -17,8 +17,9 @@
     "url": "https://github.com/noreajs/core.git"
   },
   "keywords": [
-    "norejs",
-    "rest",
+    "norea.js",
+    "norea",
+    "api",
     "framework"
   ],
   "author": "Ovnicode",
@@ -28,13 +29,14 @@
   },
   "homepage": "https://github.com/noreajs/core/blob/master/README.md",
   "devDependencies": {
+    "np": "^6.2.1",
     "tslint": "^5.20.1",
-    "typescript": "^3.7.4",
-    "@types/cors": "^2.8.6",
-    "@types/express": "^4.17.6",
-    "np": "^6.2.1"
+    "typescript": "^3.7.4"
   },
   "dependencies": {
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.17.6",
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1"
   }

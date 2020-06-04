@@ -1,3 +1,3 @@
 # Norea.Js core library
 
-Norea.js is a framework for building scalable and progressive server applications.
+Norea.Js is a sets of tools for the development of API with Node.Js.
