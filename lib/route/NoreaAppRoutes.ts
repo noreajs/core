@@ -1,37 +1,23 @@
-import express from 'express';
-
-/**
- * Type of parameter used to initialize the initializer of the application routes......., yes you get it
- */
-export type NoreaAppRoutesInitMethods = {
-    /**
-     * Filters that are applied before the application routes
-     */
-    middlewares: (app: express.Application) => void | undefined,
-
-    /**
-     * Application routes definition method
-     */
-    routes: (app: express.Application) => void
-}
+import { Application } from "express";
+import { AppRoutesInitParamsType } from "../interfaces";
 
 /**
  * Norea.Js app routes definitions,
  * Instantiate this class and define the different routes of your API
  */
 export default class NoreaAppRoutes {
-    /**
-     * Filters that are applied before the application routes
-     */
-    middlewares: (app: express.Application) => void | undefined;
+  /**
+   * Filters that are applied before the application routes
+   */
+  middlewares: (app: Application) => void | undefined;
 
-    /**
-     * Application routes definition method
-     */
-    routes: (app: express.Application) => void;
+  /**
+   * Application routes definition method
+   */
+  routes: (app: Application) => void;
 
-    constructor(init: NoreaAppRoutesInitMethods) {
-        this.middlewares = init.middlewares;
-        this.routes = init.routes;
-    }
+  constructor(init: AppRoutesInitParamsType<Application>) {
+    this.middlewares = init.middlewares;
+    this.routes = init.routes;
+  }
 }

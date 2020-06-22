@@ -1,17 +1,7 @@
 import express from "express";
 import * as core from "express-serve-static-core";
-import NoreaRouter from "./NoreaRouter";
-
-export type RouteGroupParamsType = {
-  routerOptions?: express.RouterOptions;
-  middlewares?: core.RequestHandler<
-    core.ParamsDictionary,
-    any,
-    any,
-    core.Query
-  >[];
-  routes: (router: NoreaRouter) => void;
-};
+import ExpressParser from "../helpers/ExpressParser";
+import RouteGroupParamsType from "../interfaces/RouteGroupParamsType";
 
 class Route {
   /**
@@ -22,13 +12,14 @@ class Route {
     // Params must always be merged
     const { mergeParams, ...rest } = params.routerOptions ?? {};
 
-    const expressRouter = express.Router({
-      mergeParams: true,
-      ...rest,
-    });
+    const expressRouter = ExpressParser.parseRouter(
+      express.Router({
+        mergeParams: true,
+        ...rest,
+      })
+    );
 
     // add middlewares to router
-
     if (params.middlewares && params.middlewares.length != 0) {
       expressRouter.use(params.middlewares);
     }
