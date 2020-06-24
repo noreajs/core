@@ -9,3 +9,11 @@ export {
 export { AppRoutes, NoreaAppRoutes, group } from "./route";
 export { NoreaApp, NoreaAppInitMethods } from "./NoreaApp";
 export { NoreaBootstrap } from "./NoreaBootstrap";
+export {
+  Notification,
+  EmailNotificationConstructorType,
+  IEmailNotification,
+  IPushNotification,
+  ISmsNotification,
+  NotificationConstructorType,
+} from "./modules/notifications";
