@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/noreajs/core/blob/master/README.md",
   "devDependencies": {
-    "np": "^6.2.1",
+    "np": "^6.2.4",
     "tslint": "^5.20.1",
     "typescript": "^3.7.4"
   },
