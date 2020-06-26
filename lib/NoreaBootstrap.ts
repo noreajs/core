@@ -7,6 +7,7 @@ import AppRoutes from "./route/AppRoutes";
 import { NoreaApplication } from "./interfaces";
 import ExpressParser from "./helpers/ExpressParser";
 import BootstrapInitMethods from "./interfaces/BootstrapInitParamsType";
+import helmet from "helmet";
 
 /**
  * Norea.Js application class
@@ -45,6 +46,9 @@ export class NoreaBootstrap {
    * @param port server port, default value = 3000
    */
   public start(port: number = 3000) {
+    // init helmet
+    this.app.use(helmet(this.init.helmetConfig));
+
     // init cors
     this.app.use(cors(this.init.corsOptions));
 

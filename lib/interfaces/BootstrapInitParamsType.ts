@@ -2,11 +2,13 @@ import cors from "cors";
 import http from "http";
 import https from "http";
 import bodyParser from "body-parser";
+import { IHelmetConfiguration } from "helmet";
 
 /**
  * Norea.Js app initialisation's parameter type
  */
 declare type BootstrapInitParamsType<T> = {
+  
   /**
    * Force app to run on https,
    * false as default value is recommended when the app is running localy.
@@ -80,6 +82,12 @@ declare type BootstrapInitParamsType<T> = {
    * https://www.npmjs.com/package/body-parser
    */
   bodyParserUrlEncodedOptions?: bodyParser.OptionsUrlencoded;
+
+  /**
+   * Helmet configuration
+   * https://helmetjs.github.io/docs/
+   */
+  helmetConfig?: IHelmetConfiguration;
 };
 
 export default BootstrapInitParamsType;
