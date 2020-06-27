@@ -102,7 +102,7 @@ declare type BootstrapInitParamsType<T> = {
    * Express session options
    * https://github.com/expressjs/session#readme
    */
-  sessionOptions?: SessionOptions;
+  sessionOptions?: Partial<SessionOptions>;
 };
 
 export default BootstrapInitParamsType;
