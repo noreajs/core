@@ -11,6 +11,11 @@ import BootstrapInitMethods from "./interfaces/BootstrapInitParamsType";
 import helmet from "helmet";
 import colors from "colors";
 
+/**
+ * Generate session name
+ * @param value name
+ * @param strict add .sid extension
+ */
 const sessionName = (value: string, strict: boolean = false) => {
   if (value) {
     if (strict) {
@@ -173,7 +178,9 @@ export class NoreaBootstrap {
         this.init.afterStart(this.app, server, Number(PORT));
       } else {
         console.log(colors.green("NOREA API"));
-        console.log(colors.green("===================================================="));
+        console.log(
+          colors.green("====================================================")
+        );
         console.log("Express server listening on port " + PORT);
         console.log(`Environement : ${process.env.NODE_ENV || "local"}`);
       }
