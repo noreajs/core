@@ -5,11 +5,12 @@ import http from "http";
 import https from "http";
 import bodyParser from "body-parser";
 import AppRoutes from "./route/AppRoutes";
-import { NoreaApplication } from "./interfaces";
+import { NoreaApplication, INoreaBootstrap } from "./interfaces";
 import ExpressParser from "./helpers/ExpressParser";
 import BootstrapInitMethods from "./interfaces/BootstrapInitParamsType";
 import helmet from "helmet";
 import colors from "colors";
+import e from "express";
 
 /**
  * Generate session name
@@ -33,7 +34,12 @@ const sessionName = (value: string, strict: boolean = false) => {
 /**
  * Norea.Js application class
  */
-export class NoreaBootstrap {
+export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
+  /**
+   * App started
+   */
+  public appStarted: boolean = false;
+
   /**
    * Express application instance
    */
@@ -67,6 +73,45 @@ export class NoreaBootstrap {
   }
 
   /**
+   * Set Norea.js Bootstrap setting
+   * @param setting boostrap setting
+   */
+  public setSetting(
+    setting: Omit<
+      BootstrapInitMethods<NoreaApplication>,
+      "beforeStart" | "afterStart"
+    >
+  ) {
+    /**
+     * App started
+     */
+    if (this.appStarted) {
+      console.log(colors.red("Norea.js warning - Setup"));
+      console.log(
+        colors.yellow(
+          "You can't call setSetting method when the app already started."
+        )
+      );
+    } else {
+      if (this.init) {
+        this.init = {
+          bodyParserJsonOptions:
+            setting.bodyParserJsonOptions ?? this.init.bodyParserJsonOptions,
+          bodyParserUrlEncodedOptions:
+            setting.bodyParserUrlEncodedOptions ??
+            this.init.bodyParserUrlEncodedOptions,
+          corsOptions: setting.corsOptions ?? this.init.corsOptions,
+          forceHttps: setting.forceHttps ?? this.init.forceHttps,
+          helmetConfig: setting.helmetConfig ?? this.init.helmetConfig,
+          sessionOptions: setting.sessionOptions ?? this.init.sessionOptions,
+        };
+      } else {
+        this.init = setting;
+      }
+    }
+  }
+
+  /**
    * Get application instance
    */
   public getApplication() {
@@ -78,112 +123,110 @@ export class NoreaBootstrap {
    * @param port server port, default value = 3000
    */
   public start(port: number = 3000) {
-    // init helmet
-    this.app.use(helmet(this.init.helmetConfig));
-
-    // init cors
-    this.app.use(cors(this.init.corsOptions));
-
-    // support application/json type post data
-    this.app.use(bodyParser.json(this.init.bodyParserJsonOptions));
-
-    //support application/x-www-form-urlencoded post data
-    if (this.init.bodyParserUrlEncodedOptions) {
-      const { extended, ...rest } = this.init.bodyParserUrlEncodedOptions;
-      this.app.use(
-        bodyParser.urlencoded({ extended: extended ?? false, ...rest })
-      );
-    } else {
-      this.app.use(bodyParser.urlencoded({ extended: false }));
-    }
-
-    // express session
-    if (this.init.sessionOptions) {
-      this.app.use(
-        session({
-          secret: this.init.sessionOptions.secret ?? this.app.secretKey,
-          resave: this.init.sessionOptions.resave ?? false,
-          saveUninitialized: this.init.sessionOptions.saveUninitialized ?? true,
-          name:
-            sessionName(this.init.sessionOptions.name, true) ??
-            sessionName(this.app.appName),
-          cookie: this.init.sessionOptions.cookie ?? {
-            httpOnly: true,
-            secure: this.app.get("env") === "production",
-            maxAge: 1000 * 60 * 60, // 1 hour
-          },
-          store: this.init.sessionOptions.store,
-        })
-      );
-    } else {
-      /**
-       * Notify for eventual vulnerability
-       */
-      if (this.app.get("env") === "production") {
-        console.log(colors.red("Norea.js warning - Express session"));
-        console.log(
-          colors.yellow(
-            "Session IDs are stored in memory and this is not optimal for a production environment. Set a session store in sessionOptions while initializing the application."
-          )
-        );
-      }
-
-      this.app.use(
-        session({
-          secret: this.app.secretKey,
-          resave: false,
-          saveUninitialized: true,
-          name: sessionName(this.app.appName),
-          cookie: {
-            httpOnly: true,
-            secure: this.app.get("env") === "production",
-            maxAge: 1000 * 60 * 60, // 1 hour
-          },
-        })
-      );
-    }
-
-    // before start callback
-    if (this.init.beforeStart) {
-      this.init.beforeStart(this.app);
-    }
-
-    // set middlewares
-    if (this.routes.middlewares) {
-      this.routes.middlewares(this.app);
-    }
-
-    // Set api routes
-    this.routes.routes(this.app);
-
-    // App port
-    const PORT = process.env.PORT || port;
-
     /**
-     * Create server
+     * Only when the app has not yet started
      */
-
-    // default server
-    const defaultServer = process.env.NODE_ENV ? https.Server : http.Server;
-
-    // new server instance
-    const server = new (this.init.forceHttps === true
-      ? https.Server
-      : defaultServer)(this.app);
-
-    // Start app
-    server.listen(PORT, () => {
-      // call after start callback
-      if (this.init.afterStart) {
-        this.init.afterStart(this.app, server, Number(PORT));
-      } else {
-        console.log(colors.green("NOREA API"));
-        console.log(
-          colors.green("====================================================")
-        );
-        console.log("Express server listening on port " + PORT);
-        console.log(`Environement : ${process.env.NODE_ENV || "local"}`);
+    if (!this.appStarted) {
+      // before start callback
+      if (this.init.beforeStart) {
+        this.init.beforeStart(this.app, this);
       }
-    });
+
+      // init helmet
+      this.app.use(helmet(this.init.helmetConfig));
+
+      // init cors
+      this.app.use(cors(this.init.corsOptions));
+
+      // support application/json type post data
+      this.app.use(bodyParser.json(this.init.bodyParserJsonOptions));
+
+      //support application/x-www-form-urlencoded post data
+      if (this.init.bodyParserUrlEncodedOptions) {
+        const { extended, ...rest } = this.init.bodyParserUrlEncodedOptions;
+        this.app.use(
+          bodyParser.urlencoded({ extended: extended ?? false, ...rest })
+        );
+      } else {
+        this.app.use(bodyParser.urlencoded({ extended: false }));
+      }
+
+      // express session
+      if (this.init.sessionOptions) {
+        this.app.use(
+          session({
+            secret: this.init.sessionOptions.secret ?? this.app.secretKey,
+            resave: this.init.sessionOptions.resave ?? false,
+            saveUninitialized:
+              this.init.sessionOptions.saveUninitialized ?? true,
+            name:
+              sessionName(this.init.sessionOptions.name, true) ??
+              sessionName(this.app.appName),
+            cookie: this.init.sessionOptions.cookie ?? {
+              httpOnly: true,
+              secure: this.app.get("env") === "production",
+              maxAge: 1000 * 60 * 60, // 1 hour
+            },
+            store: this.init.sessionOptions.store,
+          })
+        );
+
+        /**
+         * Notify for eventual vulnerability
+         */
+        if (
+          !this.init.sessionOptions.store &&
+          this.app.get("env") === "production"
+        ) {
+          console.log(colors.red("Norea.js warning - Express session"));
+          console.log(
+            colors.yellow(
+              "Session IDs are stored in memory and this is not optimal for a production environment. Set a session store in sessionOptions while initializing the application."
+            )
+          );
+        }
+      }
+
+      // set middlewares
+      if (this.routes.middlewares) {
+        this.routes.middlewares(this.app);
+      }
+
+      // Set api routes
+      this.routes.routes(this.app);
+
+      // App port
+      const PORT = process.env.PORT || port;
+
+      /**
+       * Create server
+       */
+
+      // default server
+      const defaultServer = process.env.NODE_ENV ? https.Server : http.Server;
+
+      // new server instance
+      const server = new (this.init.forceHttps === true
+        ? https.Server
+        : defaultServer)(this.app);
+
+      // Start app
+      server.listen(PORT, () => {
+        // set app started
+        this.appStarted = true;
+
+        // call after start callback
+        if (this.init.afterStart) {
+          this.init.afterStart(this.app, server, Number(PORT));
+        } else {
+          console.log(colors.green("NOREA API"));
+          console.log(
+            colors.green("====================================================")
+          );
+          console.log("Express server listening on port " + PORT);
+          console.log(`Environement : ${process.env.NODE_ENV || "local"}`);
+        }
+      });
+    }
   }
 }

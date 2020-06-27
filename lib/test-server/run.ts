@@ -7,7 +7,13 @@ import { NoreaBootstrap } from "../NoreaBootstrap";
 const bootstrap = new NoreaBootstrap(apiRoutes, {
   appName: "Norea.js Applications",
   forceHttps: false,
-  beforeStart: (app) => {},
+  beforeStart: (app, bootstrap) => {
+    // bootstrap.setSetting({
+    //   sessionOptions: {
+    //     store: undefined,
+    //   },
+    // });
+  },
   afterStart: (app, server, port) => {
     console.log("App started"),
       console.log("Your app is running on port", port);

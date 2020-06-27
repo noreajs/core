@@ -4,6 +4,7 @@ import https from "http";
 import bodyParser from "body-parser";
 import { IHelmetConfiguration } from "helmet";
 import { SessionOptions } from "express-session";
+import INoreaBootstrap from "./INoreaBootstrap";
 
 /**
  * Norea.Js app initialisation's parameter type
@@ -46,7 +47,7 @@ declare type BootstrapInitParamsType<T> = {
    * });
    * ```
    */
-  beforeStart?: (app: T) => void | undefined;
+  beforeStart?: (app: T, bootstrap: INoreaBootstrap<T>) => void | undefined;
 
   /**
    * This method is executed after the application has started.
