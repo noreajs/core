@@ -9,6 +9,7 @@ import { NoreaApplication } from "./interfaces";
 import ExpressParser from "./helpers/ExpressParser";
 import BootstrapInitMethods from "./interfaces/BootstrapInitParamsType";
 import helmet from "helmet";
+import colors from "colors";
 
 const sessionName = (value: string, strict: boolean = false) => {
   if (value) {
@@ -41,7 +42,10 @@ export class NoreaBootstrap {
   /**
    * Initialization parameters
    */
-  private init: Omit<BootstrapInitMethods<NoreaApplication>, "appName"|"secretKey">;
+  private init: Omit<
+    BootstrapInitMethods<NoreaApplication>,
+    "appName" | "secretKey"
+  >;
 
   constructor(routes: AppRoutes, init: BootstrapInitMethods<NoreaApplication>) {
     // set app
@@ -92,9 +96,7 @@ export class NoreaBootstrap {
     if (this.init.sessionOptions) {
       this.app.use(
         session({
-          secret:
-            this.init.sessionOptions.secret ??
-            this.app.secretKey,
+          secret: this.init.sessionOptions.secret ?? this.app.secretKey,
           resave: this.init.sessionOptions.resave ?? false,
           saveUninitialized: this.init.sessionOptions.saveUninitialized ?? true,
           name:
@@ -105,9 +107,22 @@ export class NoreaBootstrap {
             secure: this.app.get("env") === "production",
             maxAge: 1000 * 60 * 60, // 1 hour
           },
+          store: this.init.sessionOptions.store,
         })
       );
     } else {
+      /**
+       * Notify for eventual vulnerability
+       */
+      if (this.app.get("env") === "production") {
+        console.log(colors.red("Norea.js warning - Express session"));
+        console.log(
+          colors.yellow(
+            "Session IDs are stored in memory and this is not optimal for a production environment. Set a session store in sessionOptions while initializing the application."
+          )
+        );
+      }
+
       this.app.use(
         session({
           secret: this.app.secretKey,
@@ -157,8 +172,8 @@ export class NoreaBootstrap {
       if (this.init.afterStart) {
         this.init.afterStart(this.app, server, Number(PORT));
       } else {
-        console.log("NOREA API");
-        console.log("====================================================");
+        console.log(colors.green("NOREA API"));
+        console.log(colors.green("===================================================="));
         console.log("Express server listening on port " + PORT);
         console.log(`Environement : ${process.env.NODE_ENV || "local"}`);
       }

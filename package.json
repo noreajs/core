@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/noreajs/core/blob/master/README.md",
   "devDependencies": {
+    "@types/colors": "^1.2.1",
     "np": "^6.2.4",
     "tslint": "^5.20.1",
     "typescript": "^3.7.4"
@@ -39,6 +40,7 @@
     "@types/helmet": "0.0.47",
     "@types/mailgen": "^2.0.3",
     "body-parser": "^1.19.0",
+    "colors": "^1.4.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
