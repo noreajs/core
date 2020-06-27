@@ -1,6 +1,6 @@
 {
   "name": "@noreajs/core",
-  "version": "1.1.2-1",
+  "version": "1.1.2-2",
   "description": "Norea.Js is a sets of tools for the development of API with Node.Js.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
