@@ -4,6 +4,16 @@ import RouteGroupParamsType from "./RouteGroupParamsType";
 
 interface NoreaApplication extends Application {
   /**
+   * App name
+   */
+  appName: string;
+
+  /**
+   * Secret key
+   */
+  secretKey: string;
+
+  /**
    * Group many routes to a single block
    * @param prefix group prefix
    * @param params group params

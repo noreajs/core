@@ -1,4 +1,5 @@
 import express from "express";
+import session from "express-session";
 import cors from "cors";
 import http from "http";
 import https from "http";
@@ -8,6 +9,20 @@ import { NoreaApplication } from "./interfaces";
 import ExpressParser from "./helpers/ExpressParser";
 import BootstrapInitMethods from "./interfaces/BootstrapInitParamsType";
 import helmet from "helmet";
+
+const sessionName = (value: string, strict: boolean = false) => {
+  if (value) {
+    if (strict) {
+      return value.toLocaleLowerCase();
+    } else {
+      return `${
+        value.toLocaleLowerCase().replace(/\s/g, "-") ?? "session"
+      }.sid`;
+    }
+  } else {
+    return `session.sid`;
+  }
+};
 
 /**
  * Norea.Js application class
@@ -26,11 +41,19 @@ export class NoreaBootstrap {
   /**
    * Initialization parameters
    */
-  private init: BootstrapInitMethods<NoreaApplication>;
+  private init: Omit<BootstrapInitMethods<NoreaApplication>, "appName"|"secretKey">;
 
   constructor(routes: AppRoutes, init: BootstrapInitMethods<NoreaApplication>) {
-    this.app = ExpressParser.parseApplication(express());
+    // set app
+    this.app = ExpressParser.parseApplication(express(), {
+      appName: init?.appName,
+      secretKey: init?.secretKey,
+    });
+
+    // set routes
     this.routes = routes;
+
+    // set init parameters
     this.init = init;
   }
 
@@ -63,6 +86,41 @@ export class NoreaBootstrap {
       );
     } else {
       this.app.use(bodyParser.urlencoded({ extended: false }));
+    }
+
+    // express session
+    if (this.init.sessionOptions) {
+      this.app.use(
+        session({
+          secret:
+            this.init.sessionOptions.secret ??
+            this.app.secretKey,
+          resave: this.init.sessionOptions.resave ?? false,
+          saveUninitialized: this.init.sessionOptions.saveUninitialized ?? true,
+          name:
+            sessionName(this.init.sessionOptions.name, true) ??
+            sessionName(this.app.appName),
+          cookie: this.init.sessionOptions.cookie ?? {
+            httpOnly: true,
+            secure: this.app.get("env") === "production",
+            maxAge: 1000 * 60 * 60, // 1 hour
+          },
+        })
+      );
+    } else {
+      this.app.use(
+        session({
+          secret: this.app.secretKey,
+          resave: false,
+          saveUninitialized: true,
+          name: sessionName(this.app.appName),
+          cookie: {
+            httpOnly: true,
+            secure: this.app.get("env") === "production",
+            maxAge: 1000 * 60 * 60, // 1 hour
+          },
+        })
+      );
     }
 
     // before start callback

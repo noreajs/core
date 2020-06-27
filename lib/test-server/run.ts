@@ -5,6 +5,7 @@ import { NoreaBootstrap } from "../NoreaBootstrap";
  * Create a new NoreaJs App
  */
 const bootstrap = new NoreaBootstrap(apiRoutes, {
+  appName: "Norea.js Applications",
   forceHttps: false,
   beforeStart: (app) => {},
   afterStart: (app, server, port) => {

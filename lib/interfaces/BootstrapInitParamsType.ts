@@ -3,12 +3,21 @@ import http from "http";
 import https from "http";
 import bodyParser from "body-parser";
 import { IHelmetConfiguration } from "helmet";
+import { SessionOptions } from "express-session";
 
 /**
  * Norea.Js app initialisation's parameter type
  */
 declare type BootstrapInitParamsType<T> = {
-  
+  /**
+   * App name
+   */
+  appName?: string;
+
+  /**
+   * App Secret key
+   */
+  secretKey?: string;
   /**
    * Force app to run on https,
    * false as default value is recommended when the app is running localy.
@@ -88,6 +97,12 @@ declare type BootstrapInitParamsType<T> = {
    * https://helmetjs.github.io/docs/
    */
   helmetConfig?: IHelmetConfiguration;
+
+  /**
+   * Express session options
+   * https://github.com/expressjs/session#readme
+   */
+  sessionOptions?: SessionOptions;
 };
 
 export default BootstrapInitParamsType;

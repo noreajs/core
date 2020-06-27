@@ -1,4 +1,5 @@
 import * as core from "express-serve-static-core";
+import crypto from "crypto";
 import NoreaRouter from "../interfaces/NoreaRouter";
 import { routerGroup, applicationGroup } from "../route/group";
 import { Application } from "express";
@@ -19,9 +20,26 @@ class ExpressParser {
    * Parse native express application to norea.js application
    * @param app express application
    */
-  parseApplication(app: Application): NoreaApplication {
+  parseApplication(
+    app: Application,
+    attributes?: Pick<NoreaApplication, "appName" | "secretKey">
+  ): NoreaApplication {
     const parsed = app as NoreaApplication;
+
+    /**
+     * Inject route's group method
+     */
     parsed.group = applicationGroup;
+
+    /**
+     * Attributes to be injected
+     */
+    if (attributes) {
+      parsed.appName = attributes.appName;
+      parsed.secretKey =
+        attributes.appName ?? crypto.randomBytes(25).toString("hex");
+    }
+
     return parsed;
   }
 }
