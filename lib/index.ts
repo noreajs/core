@@ -9,6 +9,7 @@ export {
   AfterStartFunctionType,
   BeforeInitFunctionType,
   BeforeStartFunctionType,
+  UpdateInitConfigParamType,
 } from "./interfaces";
 export { AppRoutes, NoreaAppRoutes, group } from "./route";
 export { NoreaApp, NoreaAppInitMethods } from "./NoreaApp";

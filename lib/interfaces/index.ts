@@ -8,4 +8,5 @@ export {
   BeforeInitFunctionType,
   AfterStartFunctionType,
   BeforeStartFunctionType,
+  UpdateInitConfigParamType,
 } from "./INoreaBootstrap";
