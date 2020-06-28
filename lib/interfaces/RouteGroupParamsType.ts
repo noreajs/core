@@ -1,15 +1,9 @@
-import express from "express";
-import * as core from "express-serve-static-core";
+import { RequestHandler, RouterOptions } from "express";
 import NoreaRouter from "./NoreaRouter";
 
 declare type RouteGroupParamsType = {
-  routerOptions?: express.RouterOptions;
-  middlewares?: core.RequestHandler<
-    core.ParamsDictionary,
-    any,
-    any,
-    core.Query
-  >[];
+  routerOptions?: RouterOptions;
+  middlewares?: RequestHandler[];
   routes: (router: NoreaRouter) => void;
 };
 
