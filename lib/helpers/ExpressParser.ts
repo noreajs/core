@@ -1,8 +1,7 @@
-import * as core from "express-serve-static-core";
 import crypto from "crypto";
 import NoreaRouter from "../interfaces/NoreaRouter";
 import { routerGroup, applicationGroup } from "../route/group";
-import { Application } from "express";
+import { Application, Router } from "express";
 import NoreaApplication from "../interfaces/NoreaApplication";
 
 class ExpressParser {
@@ -10,7 +9,7 @@ class ExpressParser {
    * Parse native express router to norea.js router
    * @param router express router
    */
-  parseRouter(router: core.Router): NoreaRouter {
+  parseRouter(router: Router): NoreaRouter {
     const parsed = router as NoreaRouter;
     parsed.group = routerGroup;
     return parsed;

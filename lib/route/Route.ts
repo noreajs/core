@@ -1,5 +1,4 @@
-import express from "express";
-import * as core from "express-serve-static-core";
+import { Router } from "express";
 import ExpressParser from "../helpers/ExpressParser";
 import RouteGroupParamsType from "../interfaces/RouteGroupParamsType";
 
@@ -8,12 +7,12 @@ class Route {
    * Group routes together to make it a module
    * @param params group params
    */
-  static group(params: RouteGroupParamsType): core.Router {
+  static group(params: RouteGroupParamsType): Router {
     // Params must always be merged
     const { mergeParams, ...rest } = params.routerOptions ?? {};
 
     const expressRouter = ExpressParser.parseRouter(
-      express.Router({
+      Router({
         mergeParams: true,
         ...rest,
       })

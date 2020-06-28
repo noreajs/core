@@ -1,11 +1,10 @@
-import * as core from "express-serve-static-core";
-import express from "express";
+import { Router } from "express";
 import RouteGroupParamsType from "./RouteGroupParamsType";
 
 /**
  * Norea router
  */
-interface NoreaRouter extends core.Router {
+interface NoreaRouter extends Router {
   /**
    * Group many routes to a single block
    * @param prefix group prefix

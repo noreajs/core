@@ -1,5 +1,4 @@
-import express, { Application } from "express";
-import NoreaRouter from "./NoreaRouter";
+import { Application } from "express";
 import RouteGroupParamsType from "./RouteGroupParamsType";
 
 interface NoreaApplication extends Application {

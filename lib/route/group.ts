@@ -1,5 +1,5 @@
 import NoreaRouter from "../interfaces/NoreaRouter";
-import express from "express";
+import { RequestHandler, Router } from "express";
 import NoreaApplication from "../interfaces/NoreaApplication";
 import { RouteGroupParamsType } from "../interfaces";
 
@@ -10,10 +10,10 @@ import { RouteGroupParamsType } from "../interfaces";
  * @param routes group routes
  */
 export function group(
-  middlewares: express.RequestHandler[],
+  middlewares: RequestHandler[],
   routes: (router: NoreaRouter) => NoreaRouter
 ) {
-  const expressRouter = express.Router({
+  const expressRouter = Router({
     mergeParams: true,
   }) as NoreaRouter;
 
@@ -49,7 +49,7 @@ export function routerGroup(
   // Params must always be merged
   const { mergeParams, ...rest } = groupParams.routerOptions ?? {};
 
-  const expressRouter = express.Router({
+  const expressRouter = Router({
     mergeParams: true,
     ...rest,
   }) as NoreaRouter;
@@ -92,7 +92,7 @@ export function applicationGroup(
   // Params must always be merged
   const { mergeParams, ...rest } = groupParams.routerOptions ?? {};
 
-  const expressRouter = express.Router({
+  const expressRouter = Router({
     mergeParams: true,
     ...rest,
   }) as NoreaRouter;

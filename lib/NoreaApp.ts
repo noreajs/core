@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Application } from "express";
 import cors from "cors";
 import http from "http";
 import https from "http";
@@ -20,7 +20,7 @@ export type NoreaAppInitMethods = {
    * This method is executed during the initialization of the application.
    * It is in this method that external packages are initialized.
    *
-   *  @param {express.Application} app Express application
+   *  @param {Application} app Express application
    *
    * Example:
    *
@@ -60,7 +60,7 @@ export type NoreaAppInitMethods = {
    *
    */
   afterStart?: (
-    app: express.Application,
+    app: Application,
     server: https.Server | http.Server,
     port: number
   ) => void | undefined;
