@@ -5,7 +5,10 @@ export {
   NoreaRouter,
   AppRoutesInitParamsType,
   BootstrapInitParamsType,
-  INoreaBootstrap
+  INoreaBootstrap,
+  AfterStartFunctionType,
+  BeforeInitFunctionType,
+  BeforeStartFunctionType,
 } from "./interfaces";
 export { AppRoutes, NoreaAppRoutes, group } from "./route";
 export { NoreaApp, NoreaAppInitMethods } from "./NoreaApp";

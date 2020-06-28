@@ -4,7 +4,11 @@ import https from "http";
 import bodyParser from "body-parser";
 import { IHelmetConfiguration } from "helmet";
 import { SessionOptions } from "express-session";
-import INoreaBootstrap from "./INoreaBootstrap";
+import INoreaBootstrap, {
+  BeforeInitFunctionType,
+  BeforeStartFunctionType,
+  AfterStartFunctionType,
+} from "./INoreaBootstrap";
 
 /**
  * Norea.Js app initialisation's parameter type
@@ -47,10 +51,7 @@ declare type BootstrapInitParamsType<T> = {
    * });
    * ```
    */
-  beforeInit?: (
-    app: T,
-    bootstrap: INoreaBootstrap<T>
-  ) => void | Promise<void> | undefined;
+  beforeInit?: BeforeInitFunctionType<T>;
 
   /**
    * This method is executed during the initialization of the application.
@@ -73,7 +74,7 @@ declare type BootstrapInitParamsType<T> = {
    * });
    * ```
    */
-  beforeStart?: (app: T) => void | Promise<void> | undefined;
+  beforeStart?: BeforeStartFunctionType<T>;
 
   /**
    * This method is executed after the application has started.
@@ -95,11 +96,7 @@ declare type BootstrapInitParamsType<T> = {
    * ```
    *
    */
-  afterStart?: (
-    app: T,
-    server: https.Server | http.Server,
-    port: number
-  ) => void | Promise<void> | undefined;
+  afterStart?: AfterStartFunctionType<T>;
 
   /**
    * CORS options

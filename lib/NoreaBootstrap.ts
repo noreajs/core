@@ -5,7 +5,13 @@ import http from "http";
 import https from "http";
 import bodyParser from "body-parser";
 import AppRoutes from "./route/AppRoutes";
-import { NoreaApplication, INoreaBootstrap } from "./interfaces";
+import {
+  NoreaApplication,
+  INoreaBootstrap,
+  BeforeInitFunctionType,
+  BeforeStartFunctionType,
+  AfterStartFunctionType,
+} from "./interfaces";
 import ExpressParser from "./helpers/ExpressParser";
 import BootstrapInitMethods from "./interfaces/BootstrapInitParamsType";
 import helmet from "helmet";
@@ -52,12 +58,12 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
   /**
    * Initialization parameters
    */
-  private init: Omit<
-    BootstrapInitMethods<NoreaApplication>,
-    "appName" | "secretKey"
-  >;
+  private init: BootstrapInitMethods<NoreaApplication>;
 
-  constructor(routes: AppRoutes, init: BootstrapInitMethods<NoreaApplication>) {
+  constructor(
+    routes: AppRoutes,
+    init?: BootstrapInitMethods<NoreaApplication>
+  ) {
     // set app
     this.app = ExpressParser.parseApplication(express(), {
       appName: init?.appName,
@@ -68,45 +74,111 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
     this.routes = routes;
 
     // set init parameters
-    this.init = init;
+    this.init = init ?? {};
   }
 
   /**
    * Set Norea.js Bootstrap setting
    * @param setting boostrap setting
    */
-  public setSetting(
+  public updateInitConfig(
     setting: Omit<
       BootstrapInitMethods<NoreaApplication>,
-      "beforeStart" | "afterStart"
+      "beforeStart" | "afterStart" | "beforeInit"
     >
   ) {
     /**
      * App started
      */
     if (this.appStarted) {
-      console.log(colors.red("Norea.js warning - Setup"));
+      console.log(colors.yellow("Norea.js warning - Setup"));
       console.log(
         colors.yellow(
-          "You can't call setSetting method when the app already started."
+          "You can't call updateInitConfig method when the app already started."
         )
       );
     } else {
-      if (this.init) {
-        this.init = {
-          bodyParserJsonOptions:
-            setting.bodyParserJsonOptions ?? this.init.bodyParserJsonOptions,
-          bodyParserUrlEncodedOptions:
-            setting.bodyParserUrlEncodedOptions ??
-            this.init.bodyParserUrlEncodedOptions,
-          corsOptions: setting.corsOptions ?? this.init.corsOptions,
-          forceHttps: setting.forceHttps ?? this.init.forceHttps,
-          helmetConfig: setting.helmetConfig ?? this.init.helmetConfig,
-          sessionOptions: setting.sessionOptions ?? this.init.sessionOptions,
-        };
-      } else {
-        this.init = setting;
-      }
+      const { afterStart, beforeStart, beforeInit, ...initRest } = this.init;
+      this.init = {
+        afterStart,
+        beforeInit,
+        beforeStart,
+        bodyParserJsonOptions:
+          setting.bodyParserJsonOptions ?? initRest.bodyParserJsonOptions,
+        bodyParserUrlEncodedOptions:
+          setting.bodyParserUrlEncodedOptions ??
+          initRest.bodyParserUrlEncodedOptions,
+        corsOptions: setting.corsOptions ?? initRest.corsOptions,
+        forceHttps: setting.forceHttps ?? initRest.forceHttps,
+        helmetConfig: setting.helmetConfig ?? initRest.helmetConfig,
+        sessionOptions: setting.sessionOptions ?? initRest.sessionOptions,
+      };
+
+      /**
+       * Update app informations
+       */
+      this.app.appName = setting.appName ?? initRest.appName;
+      this.app.secretKey = setting.appName ?? initRest.appName;
+    }
+  }
+
+  /**
+   * Before app initialization callback
+   * @param value callback
+   */
+  public beforeInit(value: BeforeInitFunctionType<NoreaApplication>) {
+    /**
+     * App started
+     */
+    if (this.appStarted) {
+      console.log(colors.yellow("Norea.js warning - Setup"));
+      console.log(
+        colors.yellow(
+          "You can't call beforeInit method when the app already started."
+        )
+      );
+    } else {
+      this.init.beforeInit = value;
+    }
+  }
+
+  /**
+   * Method to be called before starting the server
+   * @param value callback
+   */
+  public beforeStart(value: BeforeStartFunctionType<NoreaApplication>) {
+    /**
+     * App started
+     */
+    if (this.appStarted) {
+      console.log(colors.yellow("Norea.js warning - Setup"));
+      console.log(
+        colors.yellow(
+          "You can't call beforeStart method when the app already started."
+        )
+      );
+    } else {
+      this.init.beforeStart = value;
+    }
+  }
+
+  /**
+   * Method to be called once the server start
+   * @param value callback
+   */
+  public afterStart(value: AfterStartFunctionType<NoreaApplication>) {
+    /**
+     * App started
+     */
+    if (this.appStarted) {
+      console.log(colors.yellow("Norea.js warning - Setup"));
+      console.log(
+        colors.yellow(
+          "You can't call afterStart method when the app already started."
+        )
+      );
+    } else {
+      this.init.afterStart = value;
     }
   }
 
@@ -128,7 +200,7 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
     if (!this.appStarted) {
       // before init callback
       if (this.init.beforeInit) {
-        await this.init.beforeInit(this.app, this);
+        await this.init.beforeInit(this.app);
       }
 
       // init helmet
@@ -200,7 +272,7 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
       this.routes.routes(this.app);
 
       // App port
-      const PORT = process.env.PORT || port;
+      const PORT = process.env.PORT ?? port;
 
       /**
        * Create server
