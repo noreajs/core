@@ -3,13 +3,13 @@ import BootstrapInitParamsType from "./BootstrapInitParamsType";
 export default interface INoreaBootstrap<T> {
   /**
    * Set Norea.js Bootstrap setting
-   * @param setting boostrap setting
-   */
-  setSetting(
-    setting: Omit<
+   * @param {Omit<
       BootstrapInitParamsType<T>,
       "beforeStart" | "afterStart"
-    >
+    >} setting boostrap setting
+   */
+  setSetting(
+    setting: Omit<BootstrapInitParamsType<T>, "beforeStart" | "afterStart">
   ): void;
 
   /**

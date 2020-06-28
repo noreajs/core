@@ -27,6 +27,32 @@ declare type BootstrapInitParamsType<T> = {
   forceHttps?: boolean;
 
   /**
+   * This method is executed during the initialization of the application (extension of express application).
+   * It is in this method that external packages are initialized.
+   *
+   *  @param {T} app Express application
+   *
+   * Example:
+   *
+   * ```
+   * const app = new NoreaBootstrap(apiRoutes, {
+   *     beforeStart: (app, bootstrap) => {
+   *          // init cors
+   *          app.use(cors());
+   *          // support application/json type post data
+   *          app.use(bodyParser.json());
+   *          //support application/x-www-form-urlencoded post data
+   *          app.use(bodyParser.urlencoded({ extended: false }));
+   *     },
+   * });
+   * ```
+   */
+  beforeInit?: (
+    app: T,
+    bootstrap: INoreaBootstrap<T>
+  ) => void | Promise<void> | undefined;
+
+  /**
    * This method is executed during the initialization of the application.
    * It is in this method that external packages are initialized.
    *
@@ -35,7 +61,7 @@ declare type BootstrapInitParamsType<T> = {
    * Example:
    *
    * ```
-   * const app = new NoreaApp(apiRoutes, {
+   * const app = new NoreaBootstrap(apiRoutes, {
    *     beforeStart: (app) => {
    *          // init cors
    *          app.use(cors());
@@ -47,7 +73,7 @@ declare type BootstrapInitParamsType<T> = {
    * });
    * ```
    */
-  beforeStart?: (app: T, bootstrap: INoreaBootstrap<T>) => void | undefined;
+  beforeStart?: (app: T) => void | Promise<void> | undefined;
 
   /**
    * This method is executed after the application has started.
@@ -59,7 +85,7 @@ declare type BootstrapInitParamsType<T> = {
    * Example:
    *
    * ```
-   * const app = new NoreaApp(apiRoutes, {
+   * const app = new NoreaBootstrap(apiRoutes, {
    *     beforeStart: (app) => {
    *     },
    *     afterStart: (app) => {
@@ -73,7 +99,7 @@ declare type BootstrapInitParamsType<T> = {
     app: T,
     server: https.Server | http.Server,
     port: number
-  ) => void | undefined;
+  ) => void | Promise<void> | undefined;
 
   /**
    * CORS options

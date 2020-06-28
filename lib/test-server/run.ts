@@ -5,15 +5,16 @@ import { NoreaBootstrap } from "../NoreaBootstrap";
  * Create a new NoreaJs App
  */
 const bootstrap = new NoreaBootstrap(apiRoutes, {
-  appName: "Norea.js Applications",
+  appName: "Norea.js Application",
   forceHttps: false,
-  beforeStart: (app, bootstrap) => {
-    // bootstrap.setSetting({
-    //   sessionOptions: {
-    //     store: undefined,
-    //   },
-    // });
+  beforeInit: (app, bootstrap) => {
+    bootstrap.setSetting({
+      sessionOptions: {
+        store: undefined,
+      },
+    });
   },
+  beforeStart: (app) => {},
   afterStart: (app, server, port) => {
     console.log("App started"),
       console.log("Your app is running on port", port);

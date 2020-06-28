@@ -10,7 +10,6 @@ import ExpressParser from "./helpers/ExpressParser";
 import BootstrapInitMethods from "./interfaces/BootstrapInitParamsType";
 import helmet from "helmet";
 import colors from "colors";
-import e from "express";
 
 /**
  * Generate session name
@@ -122,14 +121,14 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
    * Start your app
    * @param port server port, default value = 3000
    */
-  public start(port: number = 3000) {
+  public async start(port: number = 3000) {
     /**
      * Only when the app has not yet started
      */
     if (!this.appStarted) {
-      // before start callback
-      if (this.init.beforeStart) {
-        this.init.beforeStart(this.app, this);
+      // before init callback
+      if (this.init.beforeInit) {
+        await this.init.beforeInit(this.app, this);
       }
 
       // init helmet
@@ -187,6 +186,11 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
         }
       }
 
+      // before start callback
+      if (this.init.beforeStart) {
+        await this.init.beforeStart(this.app);
+      }
+
       // set middlewares
       if (this.routes.middlewares) {
         this.routes.middlewares(this.app);
@@ -211,20 +215,21 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
         : defaultServer)(this.app);
 
       // Start app
-      server.listen(PORT, () => {
+      await server.listen(PORT, async () => {
         // set app started
         this.appStarted = true;
 
         // call after start callback
         if (this.init.afterStart) {
-          this.init.afterStart(this.app, server, Number(PORT));
+          await this.init.afterStart(this.app, server, Number(PORT));
         } else {
           console.log(colors.green("NOREA API"));
           console.log(
             colors.green("====================================================")
           );
-          console.log("Express server listening on port " + PORT);
-          console.log(`Environement : ${process.env.NODE_ENV || "local"}`);
+          console.log("App name:", this.app.appName);
+          console.log("Express server listening port:", PORT);
+          console.log(`Environement :`, process.env.NODE_ENV || "local");
         }
       });
     }
