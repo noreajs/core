@@ -18,7 +18,7 @@ bootstrap.beforeStart(async (app) => {
 
 bootstrap.beforeInit(async (app) => {
   console.log("before init");
-
+  
   bootstrap.updateInitConfig({
     appName: "Test Server API",
     forceHttps: false,

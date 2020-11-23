@@ -1,3 +1,5 @@
+import { Validator } from "./request/validation/validator";
+
 export { default as Route } from "./route/Route";
 export {
   NoreaApplication,
@@ -22,3 +24,4 @@ export {
   ISmsNotification,
   NotificationConstructorType,
 } from "./modules/notifications";
+export { Validator } from "./request/validation/validator";
