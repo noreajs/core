@@ -19,11 +19,15 @@ export namespace Validator {
       | string
       | ((
           value: any,
+          field: string,
+          origin: DataOriginType,
           options: FieldValidationOptions,
           data: any
         ) => string | Promise<string>);
     validator: (
       value: any,
+      field: string,
+      origin: DataOriginType,
       options: FieldValidationOptions,
       data: any
     ) => Promise<boolean> | boolean;
@@ -277,16 +281,31 @@ export namespace Validator {
            */
           case "decimal":
           case "double":
-            try {
-              parseFloat(value);
-            } catch (error) {
-              addError({
-                origin,
-                field: field,
-                type: fieldType,
-                value,
-                message: [typeErrorMessage],
-              });
+            switch (origin) {
+              case "body":
+                if (typeof value !== "number") {
+                  addError({
+                    origin,
+                    field: field,
+                    type: fieldType,
+                    value,
+                    message: [typeErrorMessage],
+                  });
+                }
+                break;
+
+              case "query":
+              case "params":
+                if (isNaN(parseFloat(`${value}`))) {
+                  addError({
+                    origin,
+                    field: field,
+                    type: fieldType,
+                    value,
+                    message: [typeErrorMessage],
+                  });
+                }
+                break;
             }
             break;
 
@@ -296,16 +315,31 @@ export namespace Validator {
           case "int":
           case "long":
           case "timestamp":
-            try {
-              parseInt(value);
-            } catch (error) {
-              addError({
-                origin,
-                field: field,
-                type: fieldType,
-                value,
-                message: [typeErrorMessage],
-              });
+            switch (origin) {
+              case "body":
+                if (typeof value !== "number") {
+                  addError({
+                    origin,
+                    field: field,
+                    type: fieldType,
+                    value,
+                    message: [typeErrorMessage],
+                  });
+                }
+                break;
+
+              case "query":
+              case "params":
+                if (isNaN(parseInt(`${value}`))) {
+                  addError({
+                    origin,
+                    field: field,
+                    type: fieldType,
+                    value,
+                    message: [typeErrorMessage],
+                  });
+                }
+                break;
             }
             break;
 
@@ -313,14 +347,33 @@ export namespace Validator {
            * Object
            */
           case "object":
-            if (typeof value !== "object") {
-              addError({
-                origin,
-                field: field,
-                type: fieldType,
-                value,
-                message: [typeErrorMessage],
-              });
+            switch (origin) {
+              case "body":
+                if (typeof value !== "object") {
+                  addError({
+                    origin,
+                    field: field,
+                    type: fieldType,
+                    value,
+                    message: [typeErrorMessage],
+                  });
+                }
+                break;
+
+              case "query":
+              case "params":
+                try {
+                  JSON.parse(decodeURIComponent(value));
+                } catch (error) {
+                  addError({
+                    origin,
+                    field: field,
+                    type: fieldType,
+                    value,
+                    message: [typeErrorMessage],
+                  });
+                }
+                break;
             }
             break;
 
@@ -334,11 +387,11 @@ export namespace Validator {
          * Rules validation
          */
         for (const rule of def.rules ?? []) {
-          if (!(await rule.validator(value, def, data))) {
+          if (!(await rule.validator(value, field, origin, def, data))) {
             const errorMessage = rule.message
               ? typeof rule.message === "string"
                 ? rule.message
-                : await rule.message(value, def, data)
+                : await rule.message(value, field, origin, def, data)
               : `\`${field}\` value is not valid`;
             addError({
               origin,

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { Validator } from "../request/validation/validator";
+import { Rule } from "../request/validation/rules/Rule";
 import AppRoutes from "../route/AppRoutes";
 
 export default new AppRoutes({
@@ -54,6 +55,14 @@ export default new AppRoutes({
                 project: {
                   type: "bool",
                   required: false,
+                },
+                name: {
+                  type: "string",
+                  required: true,
+                  rules: [
+                    Rule.among(["admin", "user"]),
+                    Rule.min("7"),
+                  ],
                 },
               }),
               (req: Request, res: Response) => {
