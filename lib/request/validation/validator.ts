@@ -30,7 +30,7 @@ export namespace Validator {
       origin: DataOriginType,
       options: FieldValidationOptions,
       data: any
-    ) => Promise<boolean> | boolean;
+    ) => Promise<string | boolean> | string | boolean;
   }
 
   export interface FieldValidationOptions {
@@ -387,18 +387,24 @@ export namespace Validator {
          * Rules validation
          */
         for (const rule of def.rules ?? []) {
-          if (!(await rule.validator(value, field, origin, def, data))) {
-            const errorMessage = rule.message
-              ? typeof rule.message === "string"
-                ? rule.message
-                : await rule.message(value, field, origin, def, data)
-              : `\`${field}\` value is not valid`;
+          // define the error message
+          let errorMessage = rule.message
+            ? typeof rule.message === "string"
+              ? rule.message
+              : await rule.message(value, field, origin, def, data)
+            : `\`${field}\` value is not valid`;
+
+          // validation result
+          const result = await rule.validator(value, field, origin, def, data);
+
+          // validation fails
+          if (typeof result === "string" || result === false) {
             addError({
               origin,
               field: field,
               type: fieldType,
               value,
-              message: [errorMessage],
+              message: [typeof result === "string" ? result : errorMessage],
             });
           }
         }

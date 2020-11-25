@@ -41,7 +41,7 @@ const maxRule = (max: string | number): Validator.RuleType => {
             return true;
         }
       } catch (error) {
-        return false;
+        return error.message ?? false;
       }
     },
   };
