@@ -26,7 +26,7 @@ export default class Notification<Notifications> {
     if (Object.keys(this.email).includes(key as any)) {
       const method = (this.email as any)[key];
       // call the method
-      await method(args);
+      await method(...args);
     } else {
       throw Error(
         `Email Notification Error: The method ${key} is not defined.`
@@ -38,7 +38,7 @@ export default class Notification<Notifications> {
     if (Object.keys(this.push).includes(key as any)) {
       const method = (this.push as any)[key];
       // call the method
-      await method(args);
+      await method(...args);
     } else {
       throw Error(`Push Notification Error: The method ${key} is not defined.`);
     }
@@ -48,7 +48,7 @@ export default class Notification<Notifications> {
     if (Object.keys(this._sms).includes(key as any)) {
       const method = (this._sms as any)[key];
       // call the method
-      await method(args);
+      await method(...args);
     } else {
       throw Error(`Sms Notification Error: The method ${key} is not defined.`);
     }
