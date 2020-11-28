@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Validator } from "../request/validation/validator";
 import { Rule } from "../request/validation/rules/Rule";
 import AppRoutes from "../route/AppRoutes";
+import { Notification } from "../modules/notifications";
 
 export default new AppRoutes({
   routes: (app) => {
@@ -32,6 +33,10 @@ export default new AppRoutes({
           });
         });
 
+        module.route("/email").get((req: Request, res: Response) => {
+          // send email
+        });
+
         module.group("/projects", {
           routes: (r) => {
             r.route("/all").get([
@@ -59,10 +64,7 @@ export default new AppRoutes({
                 name: {
                   type: "string",
                   required: true,
-                  rules: [
-                    Rule.among(["admin", "user"]),
-                    Rule.min("7"),
-                  ],
+                  rules: [Rule.among(["admin", "user"]), Rule.min("7")],
                 },
               }),
               (req: Request, res: Response) => {

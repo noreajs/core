@@ -22,7 +22,7 @@ export default class Notification<Notifications> {
     this._sms = (params.smsNotification?.sms ?? {}) as Notifications;
   }
 
-  async emails(key: keyof Notifications, ...args: any[]) {
+  async emails(key: keyof Notifications, ...args: any) {
     if (Object.keys(this.email).includes(key as any)) {
       const method = (this.email as any)[key];
       // call the method
@@ -34,7 +34,7 @@ export default class Notification<Notifications> {
     }
   }
 
-  async pushs(key: keyof Notifications, ...args: any[]) {
+  async pushs(key: keyof Notifications, ...args: any) {
     if (Object.keys(this.push).includes(key as any)) {
       const method = (this.push as any)[key];
       // call the method
@@ -44,7 +44,7 @@ export default class Notification<Notifications> {
     }
   }
 
-  async sms(key: keyof Notifications, ...args: any[]) {
+  async sms(key: keyof Notifications, ...args: any) {
     if (Object.keys(this._sms).includes(key as any)) {
       const method = (this._sms as any)[key];
       // call the method
