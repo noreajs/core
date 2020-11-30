@@ -406,6 +406,9 @@ export namespace Validator {
               value,
               message: [typeof result === "string" ? result : errorMessage],
             });
+
+            // stop progression after the first error
+            break;
           }
         }
       }
