@@ -26,3 +26,4 @@ export {
 } from "./modules/notifications";
 export { Validator } from "./request/validation/validator";
 export { Rule } from "./request/validation/rules/Rule";
+export { Middleware } from "./middleware";

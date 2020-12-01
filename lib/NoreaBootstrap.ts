@@ -16,6 +16,7 @@ import ExpressParser from "./helpers/ExpressParser";
 import BootstrapInitMethods from "./interfaces/BootstrapInitParamsType";
 import helmet from "helmet";
 import colors from "colors";
+import { Middleware } from "./middleware";
 
 /**
  * Generate session name
@@ -270,6 +271,12 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
 
       // Set api routes
       this.routes.routes(this.app);
+
+      /**
+       * Gobal errors middlewares
+       * ----------------------
+       */
+      this.app.use(Middleware.errorResponseInJson);
 
       // App port
       const PORT = process.env.PORT ?? port;

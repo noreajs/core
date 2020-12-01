@@ -19,6 +19,8 @@ export default new AppRoutes({
          * Login
          */
         module.route("/login").get((req: Request, res: Response) => {
+          throw "hello world.. Fuck you";
+
           res.status(200).send({
             message: "Login",
           });
