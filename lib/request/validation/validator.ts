@@ -9,6 +9,7 @@ export namespace Validator {
     | "bool"
     | "date"
     | "timestamp"
+    | "number"
     | "double"
     | "int"
     | "long"
@@ -277,6 +278,39 @@ export namespace Validator {
             break;
 
           /**
+           * Integer
+           */
+          case "int":
+          case "long":
+          case "timestamp":
+            switch (origin) {
+              case "body":
+                if (typeof value !== "number") {
+                  addError({
+                    origin,
+                    field: field,
+                    type: fieldType,
+                    value,
+                    message: [typeErrorMessage],
+                  });
+                }
+                break;
+
+              case "query":
+              case "params":
+                if (isNaN(parseInt(`${value}`))) {
+                  addError({
+                    origin,
+                    field: field,
+                    type: fieldType,
+                    value,
+                    message: [typeErrorMessage],
+                  });
+                }
+                break;
+            }
+            break;
+          /**
            * Decimal types
            */
           case "decimal":
@@ -310,36 +344,17 @@ export namespace Validator {
             break;
 
           /**
-           * Integer
+           * Global number
            */
-          case "int":
-          case "long":
-          case "timestamp":
-            switch (origin) {
-              case "body":
-                if (typeof value !== "number") {
-                  addError({
-                    origin,
-                    field: field,
-                    type: fieldType,
-                    value,
-                    message: [typeErrorMessage],
-                  });
-                }
-                break;
-
-              case "query":
-              case "params":
-                if (isNaN(parseInt(`${value}`))) {
-                  addError({
-                    origin,
-                    field: field,
-                    type: fieldType,
-                    value,
-                    message: [typeErrorMessage],
-                  });
-                }
-                break;
+          case "number":
+            if (value !== `${Number(value)}`) {
+              addError({
+                origin,
+                field: field,
+                type: fieldType,
+                value,
+                message: [typeErrorMessage],
+              });
             }
             break;
 
