@@ -347,7 +347,7 @@ export namespace Validator {
            * Global number
            */
           case "number":
-            if (value !== `${Number(value)}`) {
+            if (`${value}` !== `${Number(value)}`) {
               addError({
                 origin,
                 field: field,
