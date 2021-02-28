@@ -197,7 +197,9 @@ export namespace Validator {
             message: [
               typeof def.required === "string"
                 ? def.required
-                : `The field \`${field}\` is required`,
+                : `The field \`${
+                    prefix ? `${prefix}.${field}` : field
+                  }\` is required`,
             ],
           });
         }
@@ -214,7 +216,7 @@ export namespace Validator {
       if (!isEmpty) {
         const typeErrorMessage = Array.isArray(def.type)
           ? def.type[1]
-          : `The value of \`${field}\` must be a valid ${fieldType}`;
+          : `The value of \`${prefix ? `${prefix}.${field}` : field}\` must be a valid ${fieldType}`;
 
         switch (fieldType) {
           /**
@@ -259,7 +261,7 @@ export namespace Validator {
                     origin,
                     def.validator,
                     result,
-                    `${prefix}.${index}`
+                    `${prefix}.${field}.${index}`
                   );
                 }
               }
@@ -483,7 +485,7 @@ export namespace Validator {
             ? typeof rule.message === "string"
               ? rule.message
               : await rule.message(value, field, origin, def, data)
-            : `\`${field}\` value is not valid`;
+            : `\`${prefix ? `${prefix}.${field}` : field}\` value is not valid`;
 
           // validation result
           const result = await rule.validator(value, field, origin, def, data);
