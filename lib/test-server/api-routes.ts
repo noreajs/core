@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { Validator } from "../request/validation/validator";
-import { Rule } from "../request/validation/rules/Rule";
 import AppRoutes from "../route/AppRoutes";
-import { Notification } from "../modules/notifications";
 
 export default new AppRoutes({
   routes: (app) => {
@@ -41,32 +39,42 @@ export default new AppRoutes({
 
         module.group("/projects", {
           routes: (r) => {
-            r.route("/all").get([
+            r.route("/create").post([
               Validator.validateRequest<{
-                user: string;
-                project: boolean;
-                name?: string;
-              }>("query", {
                 user: {
-                  type: "string",
+                  name: string;
+                  email: string;
+                  friends: Array<{ name: string }>;
+                  tags: Array<string>;
+                };
+              }>("body", {
+                user: {
+                  type: "object",
                   required: true,
-                  rules: [
-                    {
-                      message: "Say my name bitch!",
-                      validator: (value) => {
-                        return value === "LAMBOU";
+                  validator: {
+                    name: {
+                      type: "string",
+                      required: true,
+                    },
+                    email: {
+                      type: "string",
+                      required: true,
+                    },
+                    friends: {
+                      type: "array",
+                      required: true,
+                      validator: {
+                        name: {
+                          type: "string",
+                          required: true,
+                        },
                       },
                     },
-                  ],
-                },
-                project: {
-                  type: "bool",
-                  required: false,
-                },
-                name: {
-                  type: "string",
-                  required: true,
-                  rules: [Rule.among(["admin", "user"]), Rule.min("7")],
+                    tags: {
+                      type: "array",
+                      required: true,
+                    },
+                  },
                 },
               }),
               (req: Request, res: Response) => {

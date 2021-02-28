@@ -34,10 +34,11 @@ export namespace Validator {
     ) => Promise<string | boolean> | string | boolean;
   }
 
-  export interface FieldValidationOptions {
+  export interface FieldValidationOptions<Type = any> {
     type: FieldType | [FieldType, string];
     required?: boolean | string;
     rules?: RuleType[];
+    validator?: ValidateOptions<Type>;
   }
 
   export type ValidateOptions<BodyType = any> = {
@@ -99,6 +100,33 @@ export namespace Validator {
       errors: [],
     };
 
+    // validate data
+    await validateContent(data, origin, options, result);
+
+    return {
+      message: result.errors
+        .map((error) => {
+          return error.message.join("; ");
+        })
+        .join("; "),
+      errors: result.errors,
+    };
+  }
+
+  /**
+   * Validate a request data
+   *
+   * @param data any
+   * @param origin data origin
+   * @param options validation options
+   */
+  export async function validateContent<ContentType = any>(
+    data: any,
+    origin: "query" | "body" | "params",
+    options: ValidateOptions<ContentType>,
+    result: ValidationResult,
+    prefix?: string
+  ): Promise<void> {
     /**
      * Add error in the result
      * @param error error payload
@@ -163,7 +191,7 @@ export namespace Validator {
           // add error
           addError({
             origin,
-            field: field,
+            field: prefix ? `${prefix}.${field}` : field,
             type: fieldType,
             value: value,
             message: [
@@ -196,7 +224,7 @@ export namespace Validator {
             if (typeof value !== "string") {
               addError({
                 origin,
-                field: field,
+                field: prefix ? `${prefix}.${field}` : field,
                 type: fieldType,
                 value: value,
                 message: [typeErrorMessage],
@@ -211,11 +239,30 @@ export namespace Validator {
             if (!Array.isArray(value)) {
               addError({
                 origin,
-                field: field,
+                field: prefix ? `${prefix}.${field}` : field,
                 type: fieldType,
                 value,
                 message: [typeErrorMessage],
               });
+            } else {
+              /**
+               * Nested validator defined
+               * --------------------------------
+               */
+              if (def.validator) {
+                for (let index = 0; index < value.length; index++) {
+                  // nested element
+                  const element = value[index];
+                  // validate nested element
+                  await validateContent(
+                    element,
+                    origin,
+                    def.validator,
+                    result,
+                    `${prefix}.${index}`
+                  );
+                }
+              }
             }
             break;
 
@@ -233,7 +280,7 @@ export namespace Validator {
                 ) {
                   addError({
                     origin,
-                    field: field,
+                    field: prefix ? `${prefix}.${field}` : field,
                     type: fieldType,
                     value,
                     message: [typeErrorMessage],
@@ -245,7 +292,7 @@ export namespace Validator {
                 if (typeof value !== "boolean") {
                   addError({
                     origin,
-                    field: field,
+                    field: prefix ? `${prefix}.${field}` : field,
                     type: fieldType,
                     value,
                     message: [typeErrorMessage],
@@ -269,7 +316,7 @@ export namespace Validator {
             } catch (error) {
               addError({
                 origin,
-                field: field,
+                field: prefix ? `${prefix}.${field}` : field,
                 type: fieldType,
                 value,
                 message: [typeErrorMessage],
@@ -288,7 +335,7 @@ export namespace Validator {
                 if (typeof value !== "number") {
                   addError({
                     origin,
-                    field: field,
+                    field: prefix ? `${prefix}.${field}` : field,
                     type: fieldType,
                     value,
                     message: [typeErrorMessage],
@@ -301,7 +348,7 @@ export namespace Validator {
                 if (isNaN(parseInt(`${value}`))) {
                   addError({
                     origin,
-                    field: field,
+                    field: prefix ? `${prefix}.${field}` : field,
                     type: fieldType,
                     value,
                     message: [typeErrorMessage],
@@ -320,7 +367,7 @@ export namespace Validator {
                 if (typeof value !== "number") {
                   addError({
                     origin,
-                    field: field,
+                    field: prefix ? `${prefix}.${field}` : field,
                     type: fieldType,
                     value,
                     message: [typeErrorMessage],
@@ -333,7 +380,7 @@ export namespace Validator {
                 if (isNaN(parseFloat(`${value}`))) {
                   addError({
                     origin,
-                    field: field,
+                    field: prefix ? `${prefix}.${field}` : field,
                     type: fieldType,
                     value,
                     message: [typeErrorMessage],
@@ -350,7 +397,7 @@ export namespace Validator {
             if (`${value}` !== `${Number(value)}`) {
               addError({
                 origin,
-                field: field,
+                field: prefix ? `${prefix}.${field}` : field,
                 type: fieldType,
                 value,
                 message: [typeErrorMessage],
@@ -367,11 +414,25 @@ export namespace Validator {
                 if (typeof value !== "object") {
                   addError({
                     origin,
-                    field: field,
+                    field: prefix ? `${prefix}.${field}` : field,
                     type: fieldType,
                     value,
                     message: [typeErrorMessage],
                   });
+                } else {
+                  /**
+                   * Validation defined
+                   * ------------------
+                   */
+                  if (def.validator) {
+                    await validateContent(
+                      data[field],
+                      origin,
+                      def.validator,
+                      result,
+                      prefix ? `${prefix}.${field}` : field
+                    );
+                  }
                 }
                 break;
 
@@ -379,10 +440,24 @@ export namespace Validator {
               case "params":
                 try {
                   JSON.parse(decodeURIComponent(value));
+
+                  /**
+                   * Validation defined
+                   * ------------------
+                   */
+                  if (def.validator) {
+                    await validateContent(
+                      data[field],
+                      origin,
+                      def.validator,
+                      result,
+                      prefix ? `${prefix}.${field}` : field
+                    );
+                  }
                 } catch (error) {
                   addError({
                     origin,
-                    field: field,
+                    field: prefix ? `${prefix}.${field}` : field,
                     type: fieldType,
                     value,
                     message: [typeErrorMessage],
@@ -390,6 +465,7 @@ export namespace Validator {
                 }
                 break;
             }
+
             break;
 
           default:
@@ -416,7 +492,7 @@ export namespace Validator {
           if (typeof result === "string" || result === false) {
             addError({
               origin,
-              field: field,
+              field: prefix ? `${prefix}.${field}` : field,
               type: fieldType,
               value,
               message: [typeof result === "string" ? result : errorMessage],
@@ -428,14 +504,5 @@ export namespace Validator {
         }
       }
     }
-
-    return {
-      message: result.errors
-        .map((error) => {
-          return error.message.join("; ");
-        })
-        .join("; "),
-      errors: result.errors,
-    };
   }
 }
