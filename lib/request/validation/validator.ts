@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 export namespace Validator {
   export type DataOriginType = "query" | "body" | "params";
   export type FieldType =
+    | "any"
     | "string"
     | "object"
     | "array"
@@ -216,7 +217,9 @@ export namespace Validator {
       if (!isEmpty) {
         const typeErrorMessage = Array.isArray(def.type)
           ? def.type[1]
-          : `The value of \`${prefix ? `${prefix}.${field}` : field}\` must be a valid ${fieldType}`;
+          : `The value of \`${
+              prefix ? `${prefix}.${field}` : field
+            }\` must be a valid ${fieldType}`;
 
         switch (fieldType) {
           /**
