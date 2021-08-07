@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Rule } from "../request/validation/rules/Rule";
 import { Validator } from "../request/validation/validator";
 import AppRoutes from "../route/AppRoutes";
 
@@ -52,13 +53,16 @@ export default new AppRoutes({
                   type: "object",
                   required: true,
                   validator: {
+                    username: {
+                      type: "string",
+                    },
                     name: {
                       type: "string",
-                      required: true,
+                      rules: [Rule.requiredWithout("username")],
                     },
                     email: {
                       type: "string",
-                      required: true,
+                      rules: [Rule.requiredWith("name")],
                     },
                     friends: {
                       type: "array",
@@ -66,13 +70,30 @@ export default new AppRoutes({
                       validator: {
                         name: {
                           type: "string",
-                          required: true,
+                          rules: [
+                            Rule.requiredWhen((data, value, req) => {
+                              if (
+                                Array.isArray(req.body.user.tags) &&
+                                req.body.user.tags.length == 2
+                              ) {
+                                return "Friend's name is required when tags count equals 2";
+                              } else {
+                                return false;
+                              }
+                            }),
+                            Rule.startsWith("lam", false),
+                            Rule.endsWith("old", false),
+                          ],
                         },
                       },
                     },
                     tags: {
                       type: "array",
                       required: true,
+                      rules: [
+                        Rule.among(["blue", "yellow", "red", "white"]),
+                        Rule.notAmong(["red", "white"]),
+                      ],
                     },
                   },
                 },

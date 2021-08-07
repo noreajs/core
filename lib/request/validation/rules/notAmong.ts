@@ -5,16 +5,46 @@ import { Validator } from "../validator";
  * @param list list of elements
  */
 const notAmongRule = (list: (string | number)[]): Validator.RuleType => {
-  if (list.length !== 0) {
+  var localValues: any[] = list;
+  if (!Array.isArray(list)) {
+    localValues = [list];
+  }
+
+  if (localValues.length !== 0) {
     return {
       message: (_value, field) => {
         return `\`${field}\` value must not be among [${list.join(", ")}]`;
       },
       validator: (value, _field, origin) => {
-        if (origin === "body") {
-          return !list.includes(value);
-        } else {
-          return !list.includes(value) || !list.includes(parseInt(value));
+        try {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (origin === "body") {
+                if (localValues.includes(item)) {
+                  return false;
+                }
+              } else {
+                if (
+                  localValues.includes(item) &&
+                  localValues.map((v) => `${v}`).includes(item)
+                ) {
+                  return false;
+                }
+              }
+            }
+            return true;
+          } else {
+            if (origin === "body") {
+              return !localValues.includes(value);
+            } else {
+              return (
+                !localValues.includes(value) ||
+                !localValues.map((v) => `${v}`).includes(value)
+              );
+            }
+          }
+        } catch (error) {
+          return error?.message ?? false;
         }
       },
     };

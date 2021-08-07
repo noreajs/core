@@ -23,32 +23,36 @@ const amongRule = (list: (string | number)[]): Validator.RuleType => {
             .join(", ")}]`;
         }
       },
-      validator: (value, _field, _origin, _def) => {
-        if (Array.isArray(value)) {
-          for (const item of localValues) {
-            if (origin === "body") {
-              if (!localValues.includes(item)) {
-                return false;
-              }
-            } else {
-              if (
-                !localValues.includes(item) &&
-                localValues.map((v) => `${v}`).includes(item)
-              ) {
-                return false;
+      validator: (value, _field, origin, _def) => {
+        try {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (origin === "body") {
+                if (!localValues.includes(item)) {
+                  return false;
+                }
+              } else {
+                if (
+                  !localValues.includes(item) &&
+                  !localValues.map((v) => `${v}`).includes(item)
+                ) {
+                  return false;
+                }
               }
             }
-          }
-          return true;
-        } else {
-          if (origin === "body") {
-            return localValues.includes(value);
+            return true;
           } else {
-            return (
-              localValues.includes(value) ||
-              localValues.map((v) => `${v}`).includes(value)
-            );
+            if (origin === "body") {
+              return localValues.includes(value);
+            } else {
+              return (
+                localValues.includes(value) ||
+                localValues.map((v) => `${v}`).includes(value)
+              );
+            }
           }
+        } catch (error) {
+          return error?.message ?? false;
         }
       },
     };

@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import requiredRule from "./rules/valueRequired";
 
 export namespace Validator {
   export type DataOriginType = "query" | "body" | "params";
@@ -24,14 +25,16 @@ export namespace Validator {
           field: string,
           origin: DataOriginType,
           options: FieldValidationOptions,
-          data: any
+          data: any,
+          request: Request
         ) => string | Promise<string>);
     validator: (
       value: any,
       field: string,
       origin: DataOriginType,
       options: FieldValidationOptions,
-      data: any
+      data: any,
+      request: Request
     ) => Promise<string | boolean> | string | boolean;
   }
 
@@ -102,7 +105,7 @@ export namespace Validator {
     };
 
     // validate data
-    await validateContent(data, origin, options, result);
+    await validateContent(request, data, origin, options, result);
 
     return {
       message: result.errors
@@ -122,6 +125,7 @@ export namespace Validator {
    * @param options validation options
    */
   export async function validateContent<ContentType = any>(
+    request: Request,
     data: any,
     origin: "query" | "body" | "params",
     options: ValidateOptions<ContentType>,
@@ -164,19 +168,6 @@ export namespace Validator {
           return def.required === true;
         } else if (typeof def.required === "string") {
           return true;
-        }
-      })();
-
-      // field exists and has a value
-      const valueFilled = ((): boolean => {
-        if (value !== null && value !== undefined) {
-          if (typeof value === "string") {
-            return `${value}`.length !== 0;
-          } else if (Array.isArray(value)) {
-            return value.length !== 0;
-          } else {
-            return true;
-          }
         } else {
           return false;
         }
@@ -187,22 +178,10 @@ export namespace Validator {
        * --------------------------------------
        */
       if (isRequired) {
-        // the field is no defined
-        if (!valueFilled) {
-          // add error
-          addError({
-            origin,
-            field: prefix ? `${prefix}.${field}` : field,
-            type: fieldType,
-            value: value,
-            message: [
-              typeof def.required === "string"
-                ? def.required
-                : `The field \`${
-                    prefix ? `${prefix}.${field}` : field
-                  }\` is required`,
-            ],
-          });
+        if (def.rules) {
+          def.rules.unshift(requiredRule);
+        } else {
+          def.rules = [requiredRule];
         }
       }
 
@@ -214,7 +193,7 @@ export namespace Validator {
       // is empty or not defined
       const isEmpty = value === null || value === undefined;
 
-      if (!isEmpty) {
+      if (isRequired) {
         const typeErrorMessage = Array.isArray(def.type)
           ? def.type[1]
           : `The value of \`${
@@ -260,6 +239,7 @@ export namespace Validator {
                   const element = value[index];
                   // validate nested element
                   await validateContent(
+                    request,
                     element,
                     origin,
                     def.validator,
@@ -431,6 +411,7 @@ export namespace Validator {
                    */
                   if (def.validator) {
                     await validateContent(
+                      request,
                       data[field],
                       origin,
                       def.validator,
@@ -452,6 +433,7 @@ export namespace Validator {
                    */
                   if (def.validator) {
                     await validateContent(
+                      request,
                       data[field],
                       origin,
                       def.validator,
@@ -478,34 +460,46 @@ export namespace Validator {
         }
       }
 
-      if (isRequired || !isEmpty) {
-        /**
-         * Rules validation
-         */
-        for (const rule of def.rules ?? []) {
-          // define the error message
-          let errorMessage = rule.message
-            ? typeof rule.message === "string"
-              ? rule.message
-              : await rule.message(value, field, origin, def, data)
-            : `\`${prefix ? `${prefix}.${field}` : field}\` value is not valid`;
+      /**
+       * Rules validation
+       */
+      for (const rule of def.rules ?? []) {
+        // define the error message
+        let errorMessage = rule.message
+          ? typeof rule.message === "string"
+            ? rule.message
+            : await rule.message(
+                value,
+                prefix ? `${prefix}.${field}` : field,
+                origin,
+                def,
+                data,
+                request
+              )
+          : `\`${prefix ? `${prefix}.${field}` : field}\` value is not valid`;
 
-          // validation result
-          const result = await rule.validator(value, field, origin, def, data);
+        // validation result
+        const result = await rule.validator(
+          value,
+          prefix ? `${prefix}.${field}` : field,
+          origin,
+          def,
+          data,
+          request
+        );
 
-          // validation fails
-          if (typeof result === "string" || result === false) {
-            addError({
-              origin,
-              field: prefix ? `${prefix}.${field}` : field,
-              type: fieldType,
-              value,
-              message: [typeof result === "string" ? result : errorMessage],
-            });
+        // validation fails
+        if (typeof result === "string" || result === false) {
+          addError({
+            origin,
+            field: prefix ? `${prefix}.${field}` : field,
+            type: fieldType,
+            value,
+            message: [typeof result === "string" ? result : errorMessage],
+          });
 
-            // stop progression after the first error
-            break;
-          }
+          // stop progression after the first error
+          break;
         }
       }
     }

@@ -3,7 +3,7 @@ import { Validator } from "../validator";
 
 /**
  * Required with rule
- * 
+ *
  * @param dependencies dependencies
  * @param strict true for AND connector and false for OR connector
  * @returns Validator.RuleType
@@ -29,9 +29,9 @@ const requiredWithoutRule = (
       }
     },
     validator: (value, _field, _origin, def, data) => {
-      if (Array.isArray(dependencies)) {
-        // no value
-        if (!isFilled(value)) {
+      // no value
+      if (!isFilled(value)) {
+        if (Array.isArray(dependencies)) {
           // all dependencies are verified
           if (strict) {
             let filledCount = 0;
@@ -50,11 +50,12 @@ const requiredWithoutRule = (
             }
             return filledCount !== dependencies.length;
           }
+        } else {
+          return isFilled(data[dependencies]);
         }
+      } else {
         // value exists
         return true;
-      } else {
-        return !isFilled(value) && isFilled(dependencies);
       }
     },
   };
