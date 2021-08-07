@@ -5,20 +5,55 @@ import { Validator } from "../validator";
  * @param list list of elements
  */
 const amongRule = (list: (string | number)[]): Validator.RuleType => {
-  if (list.length !== 0) {
+  var localValues: any[] = list;
+  if (!Array.isArray(list)) {
+    localValues = [list];
+  }
+
+  if (localValues.length !== 0) {
     return {
-      message: (_value, field) => {
-        return `\`${field}\` value must be among [${list.join(", ")}]`;
-      },
-      validator: (value, _field, origin) => {
-        if (origin === "body") {
-          return list.includes(value);
+      message: (value, field, _origin, _def, _data) => {
+        if (Array.isArray(value)) {
+          return `Each item of \`${field}\` must be among [${localValues
+            .map((v) => `\`${v}\``)
+            .join(", ")}]`;
         } else {
-          return list.includes(value) || list.includes(parseInt(value));
+          return `\`${field}\` must be among [${localValues
+            .map((v) => `\`${v}\``)
+            .join(", ")}]`;
+        }
+      },
+      validator: (value, _field, _origin, _def) => {
+        if (Array.isArray(value)) {
+          for (const item of localValues) {
+            if (origin === "body") {
+              if (!localValues.includes(item)) {
+                return false;
+              }
+            } else {
+              if (
+                !localValues.includes(item) &&
+                localValues.map((v) => `${v}`).includes(item)
+              ) {
+                return false;
+              }
+            }
+          }
+          return true;
+        } else {
+          if (origin === "body") {
+            return localValues.includes(value);
+          } else {
+            return (
+              localValues.includes(value) ||
+              localValues.map((v) => `${v}`).includes(value)
+            );
+          }
         }
       },
     };
   } else {
+    // don't want to loose any time for no reason
     return undefined;
   }
 };
