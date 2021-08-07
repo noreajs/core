@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Rule } from "../request/validation/rules/Rule";
 import { Validator } from "../request/validation/validator";
 import AppRoutes from "../route/AppRoutes";
+import moment from "moment";
 
 export default new AppRoutes({
   routes: (app) => {
@@ -84,6 +85,19 @@ export default new AppRoutes({
                             Rule.startsWith("lam", false),
                             Rule.endsWith("old", false),
                           ],
+                        },
+                        dob: {
+                          type: "date",
+                          required: true,
+                          rules: [
+                            Rule.beforeDate(moment()),
+                            Rule.afterDate(moment().year(1995)),
+                          ],
+                        },
+                        createdAt: {
+                          type: "date",
+                          // required: true,
+                          rules: [Rule.afterFields("dob")],
                         },
                       },
                     },

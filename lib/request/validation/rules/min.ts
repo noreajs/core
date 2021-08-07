@@ -1,8 +1,10 @@
 import { Validator } from "../validator";
 
 /**
- * Check if the value is among the given elements
- * @param list list of elements
+ * Check if the value is great or equal to the min
+ * 
+ * @param min target
+ * @returns Validator.RuleType
  */
 const minRule = (min: string | number): Validator.RuleType => {
   return {

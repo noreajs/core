@@ -8,6 +8,11 @@ import requiredWithoutRule from "./requiredWithout";
 import requiredWhenRule from "./requiredWhen";
 import startsWithRule from "./startsWith";
 import endsWithRule from "./endsWith";
+import dateRule from "./date";
+import afterFieldsRule from "./afterFields";
+import beforeFieldsRule from "./beforeFields";
+import afterDateRule from "./afterDate";
+import beforeDateRule from "./beforeDate";
 
 export namespace Rule {
   export const among = amongRule;
@@ -20,4 +25,9 @@ export namespace Rule {
   export const requiredWhen = requiredWhenRule;
   export const startsWith = startsWithRule;
   export const endsWith = endsWithRule;
+  export const date = dateRule;
+  export const afterFields = afterFieldsRule;
+  export const beforeFields = beforeFieldsRule;
+  export const afterDate = afterDateRule;
+  export const beforeDate = beforeDateRule;
 }

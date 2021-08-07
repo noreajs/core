@@ -1,8 +1,10 @@
 import { Validator } from "../validator";
 
 /**
- * Check if the value is among the given elements
- * @param list list of elements
+ * Check if the value is less or equal to the given max value
+ *
+ * @param max target
+ * @returns Validator.RuleType
  */
 const maxRule = (max: string | number): Validator.RuleType => {
   return {
