@@ -1,3 +1,4 @@
+import { isFilled } from "../helpers";
 import { Validator } from "../validator";
 
 /**
@@ -21,25 +22,29 @@ const startWithRule = (
     },
     validator: (value: string | string[], _field, _origin, def) => {
       try {
-        if (Array.isArray(value)) {
-          for (const item of value) {
-            if (caseSensitive) {
-              if (!item.startsWith(pattern)) {
-                return false;
-              }
-            } else {
-              if (!item.toLowerCase().startsWith(pattern.toLowerCase())) {
-                return false;
+        if (isFilled(value)) {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (caseSensitive) {
+                if (!item.startsWith(pattern)) {
+                  return false;
+                }
+              } else {
+                if (!item.toLowerCase().startsWith(pattern.toLowerCase())) {
+                  return false;
+                }
               }
             }
-          }
-          return true;
-        } else {
-          if (caseSensitive) {
-            return value.startsWith(pattern);
+            return true;
           } else {
-            return value.toLowerCase().startsWith(pattern.toLowerCase());
+            if (caseSensitive) {
+              return value.startsWith(pattern);
+            } else {
+              return value.toLowerCase().startsWith(pattern.toLowerCase());
+            }
           }
+        } else {
+          return true;
         }
       } catch (error) {
         return error?.message ?? false;

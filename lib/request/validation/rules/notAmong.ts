@@ -1,3 +1,4 @@
+import { isFilled } from "../helpers";
 import { Validator } from "../validator";
 
 /**
@@ -17,31 +18,35 @@ const notAmongRule = (list: (string | number)[]): Validator.RuleType => {
       },
       validator: (value, _field, origin) => {
         try {
-          if (Array.isArray(value)) {
-            for (const item of value) {
-              if (origin === "body") {
-                if (localValues.includes(item)) {
-                  return false;
-                }
-              } else {
-                if (
-                  localValues.includes(item) &&
-                  localValues.map((v) => `${v}`).includes(item)
-                ) {
-                  return false;
+          if (isFilled(value)) {
+            if (Array.isArray(value)) {
+              for (const item of value) {
+                if (origin === "body") {
+                  if (localValues.includes(item)) {
+                    return false;
+                  }
+                } else {
+                  if (
+                    localValues.includes(item) &&
+                    localValues.map((v) => `${v}`).includes(item)
+                  ) {
+                    return false;
+                  }
                 }
               }
-            }
-            return true;
-          } else {
-            if (origin === "body") {
-              return !localValues.includes(value);
+              return true;
             } else {
-              return (
-                !localValues.includes(value) ||
-                !localValues.map((v) => `${v}`).includes(value)
-              );
+              if (origin === "body") {
+                return !localValues.includes(value);
+              } else {
+                return (
+                  !localValues.includes(value) ||
+                  !localValues.map((v) => `${v}`).includes(value)
+                );
+              }
             }
+          } else {
+            return true;
           }
         } catch (error) {
           return error?.message ?? false;

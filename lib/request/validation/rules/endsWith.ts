@@ -1,3 +1,4 @@
+import { isFilled } from "../helpers";
 import { Validator } from "../validator";
 
 /**
@@ -20,25 +21,29 @@ const endWithRule = (
     },
     validator: (value: string | string[], _field, _origin, def) => {
       try {
-        if (Array.isArray(value)) {
-          for (const item of value) {
-            if (caseSensitive) {
-              if (!item.endsWith(pattern)) {
-                return false;
-              }
-            } else {
-              if (!item.toLowerCase().endsWith(pattern.toLowerCase())) {
-                return false;
+        if (isFilled(value)) {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (caseSensitive) {
+                if (!item.endsWith(pattern)) {
+                  return false;
+                }
+              } else {
+                if (!item.toLowerCase().endsWith(pattern.toLowerCase())) {
+                  return false;
+                }
               }
             }
-          }
-          return true;
-        } else {
-          if (caseSensitive) {
-            return value.endsWith(pattern);
+            return true;
           } else {
-            return value.toLowerCase().endsWith(pattern.toLowerCase());
+            if (caseSensitive) {
+              return value.endsWith(pattern);
+            } else {
+              return value.toLowerCase().endsWith(pattern.toLowerCase());
+            }
           }
+        } else {
+          return true;
         }
       } catch (error) {
         return error?.message ?? false;
