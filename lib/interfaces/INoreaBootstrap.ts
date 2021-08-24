@@ -3,6 +3,9 @@ import http from "http";
 import https from "https";
 
 export type BeforeInitFunctionType<T> = (app: T) => void | Promise<void>;
+export type BeforeServerListeningFunctionType<T> = (
+  server: T
+) => void | Promise<void>;
 export type BeforeStartFunctionType<T> = (app: T) => void | Promise<void>;
 export type AfterStartFunctionType<T> = (
   app: T,
@@ -28,6 +31,14 @@ export default interface INoreaBootstrap<T> {
    * Get application instance
    */
   getApplication(): T;
+
+  /**
+   * Called before the server starts listening
+   * @param {BeforeServerListeningFunctionType<T>} callback
+   */
+  beforeServerListening(
+    callback: BeforeServerListeningFunctionType<http.Server | https.Server>
+  ): void;
 
   /**
    * Set beforeInit callback

@@ -1,22 +1,23 @@
+import { json, urlencoded } from "body-parser";
+import colors from "colors";
+import cors from "cors";
 import express from "express";
 import session from "express-session";
-import cors from "cors";
-import http from "http";
-import https from "http";
-import bodyParser from "body-parser";
-import AppRoutes from "./route/AppRoutes";
+import helmet from "helmet";
+import { default as http, default as https } from "http";
+import { Server } from "https";
+import ExpressParser from "./helpers/ExpressParser";
 import {
-  NoreaApplication,
-  INoreaBootstrap,
+  AfterStartFunctionType,
   BeforeInitFunctionType,
   BeforeStartFunctionType,
-  AfterStartFunctionType,
+  INoreaBootstrap,
+  NoreaApplication,
 } from "./interfaces";
-import ExpressParser from "./helpers/ExpressParser";
 import BootstrapInitMethods from "./interfaces/BootstrapInitParamsType";
-import helmet from "helmet";
-import colors from "colors";
+import { BeforeServerListeningFunctionType } from "./interfaces/INoreaBootstrap";
 import { Middleware } from "./middleware";
+import AppRoutes from "./route/AppRoutes";
 
 /**
  * Generate session name
@@ -79,13 +80,35 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
   }
 
   /**
+   * Called before the server starts listening
+   * @param {BeforeServerListeningFunctionType<T>} callback
+   */
+  beforeServerListening(
+    callback: BeforeServerListeningFunctionType<Server | http.Server>
+  ): void {
+    /**
+     * App started
+     */
+    if (this.appStarted) {
+      console.log(colors.yellow("Norea.js warning - Setup"));
+      console.log(
+        colors.yellow(
+          "You can't call `beforeServerListening` method when the app already started."
+        )
+      );
+    } else {
+      this.init.beforeServerListening = callback;
+    }
+  }
+
+  /**
    * Set Norea.js Bootstrap setting
    * @param setting boostrap setting
    */
   public updateInitConfig(
     setting: Omit<
       BootstrapInitMethods<NoreaApplication>,
-      "beforeStart" | "afterStart" | "beforeInit"
+      "beforeServerListening" | "beforeStart" | "afterStart" | "beforeInit"
     >
   ) {
     /**
@@ -99,11 +122,18 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
         )
       );
     } else {
-      const { afterStart, beforeStart, beforeInit, ...initRest } = this.init;
+      const {
+        afterStart,
+        beforeServerListening,
+        beforeStart,
+        beforeInit,
+        ...initRest
+      } = this.init;
       this.init = {
         afterStart,
         beforeInit,
         beforeStart,
+        beforeServerListening,
         bodyParserJsonOptions:
           setting.bodyParserJsonOptions ?? initRest.bodyParserJsonOptions,
         bodyParserUrlEncodedOptions:
@@ -211,16 +241,14 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
       this.app.use(cors(this.init.corsOptions));
 
       // support application/json type post data
-      this.app.use(bodyParser.json(this.init.bodyParserJsonOptions));
+      this.app.use(json(this.init.bodyParserJsonOptions));
 
       //support application/x-www-form-urlencoded post data
       if (this.init.bodyParserUrlEncodedOptions) {
         const { extended, ...rest } = this.init.bodyParserUrlEncodedOptions;
-        this.app.use(
-          bodyParser.urlencoded({ extended: extended ?? false, ...rest })
-        );
+        this.app.use(urlencoded({ extended: extended ?? false, ...rest }));
       } else {
-        this.app.use(bodyParser.urlencoded({ extended: false }));
+        this.app.use(urlencoded({ extended: false }));
       }
 
       // express session
@@ -286,12 +314,23 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
        */
 
       // default server
-      const defaultServer = process.env.NODE_ENV ? https.Server : http.Server;
+      var defaultServer = process.env.NODE_ENV ? https.Server : http.Server;
+
+      // force https
+      if (this.init.forceHttps === true) {
+        defaultServer = https.Server;
+      }
+
+      // support workers
+      if (this.init.supportWorkers === true) {
+        defaultServer = http.Server;
+      }
 
       // new server instance
-      const server = new (this.init.forceHttps === true
-        ? https.Server
-        : defaultServer)(this.app);
+      const server = new defaultServer(this.app);
+
+      // running required code before start listening the server
+      await this.init.beforeServerListening?.(server);
 
       // Start app
       await server.listen(PORT, async () => {
@@ -302,7 +341,9 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
         if (this.init.afterStart) {
           await this.init.afterStart(this.app, server, Number(PORT));
         } else {
-          console.log(colors.green("NOREA API"));
+          console.log(
+            colors.green(`${this.init.appName ?? "NOREA API"}`.toUpperCase())
+          );
           console.log(
             colors.green("====================================================")
           );

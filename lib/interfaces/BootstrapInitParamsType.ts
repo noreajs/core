@@ -8,6 +8,7 @@ import INoreaBootstrap, {
   BeforeInitFunctionType,
   BeforeStartFunctionType,
   AfterStartFunctionType,
+  BeforeServerListeningFunctionType,
 } from "./INoreaBootstrap";
 
 /**
@@ -23,12 +24,28 @@ declare type BootstrapInitParamsType<T> = {
    * App Secret key
    */
   secretKey?: string;
+
   /**
    * Force app to run on https,
    * false as default value is recommended when the app is running localy.
    * the server runs automatically in https when process.env.NODE_ENV is available
    */
   forceHttps?: boolean;
+
+  /**
+   * Define if the app will use workers or not. if true `forceHttps` attribute will
+   * be ignored as the server will be http
+   *
+   * @default false
+   */
+  supportWorkers?: boolean;
+
+  /**
+   * Called before the server starts listening
+   * 
+   * @param {http.Server | https.Server} server - The current server
+   */
+  beforeServerListening?: BeforeServerListeningFunctionType<http.Server | https.Server>;
 
   /**
    * This method is executed during the initialization of the application (extension of express application).
