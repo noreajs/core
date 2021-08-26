@@ -1,5 +1,8 @@
 import apiRoutes from "./api-routes";
 import { NoreaBootstrap } from "../NoreaBootstrap";
+import WorkerPoolHelper from "../helpers/WorkerPoolHelper";
+import { cpus, isMainThread, workerEmit } from "workerpool";
+import Logger from "../helpers/Logger";
 
 /**
  * Create a new NoreaJs App
@@ -7,9 +10,25 @@ import { NoreaBootstrap } from "../NoreaBootstrap";
 const bootstrap = new NoreaBootstrap(apiRoutes);
 
 bootstrap.afterStart(async (app, server, port) => {
-  console.log("after start");
-  console.log("app name:", app.appName);
-  console.log("express server port:", port);
+  WorkerPoolHelper.initWithPath(`${__dirname}/worker.js`, {
+    workerType: "thread",
+    maxWorkers: cpus,
+  });
+
+  WorkerPoolHelper.exec("eventExample", [10], {
+    on: (p) => {
+      console.log(p);
+    },
+  });
+
+  WorkerPoolHelper.exec("eventExample", [150], {
+    on: (p) => {
+      console.log(p);
+    },
+  });
+
+  console.log("is master", isMainThread);
+  console.log("stats", WorkerPoolHelper.pool.stats());
 });
 
 bootstrap.beforeStart(async (app) => {

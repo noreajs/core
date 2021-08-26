@@ -347,12 +347,12 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
         // set app started
         this.appStarted = true;
 
+        this.info();
+
         // call after start callback
         if (this.init.afterStart) {
           await this.init.afterStart(this.app, server, this.appPort);
         }
-
-        this.info();
       });
     }
   }
