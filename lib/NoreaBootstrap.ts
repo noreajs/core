@@ -6,6 +6,7 @@ import session from "express-session";
 import helmet from "helmet";
 import { default as http, default as https } from "http";
 import { Server } from "https";
+import { cpus } from "os";
 import ExpressParser from "./helpers/ExpressParser";
 import {
   AfterStartFunctionType,
@@ -42,6 +43,12 @@ const sessionName = (value: string, strict: boolean = false) => {
  * Norea.Js application class
  */
 export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
+  private appPort: number;
+
+  public get port(): number {
+    return this.appPort;
+  }
+
   /**
    * App started
    */
@@ -197,7 +204,10 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
    * Method to be called once the server start
    * @param value callback
    */
-  public afterStart(value: AfterStartFunctionType<NoreaApplication>) {
+  public afterStart(
+    this: NoreaBootstrap,
+    value: AfterStartFunctionType<NoreaApplication>
+  ) {
     /**
      * App started
      */
@@ -307,7 +317,7 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
       this.app.use(Middleware.errorResponseInJson);
 
       // App port
-      const PORT = process.env.PORT ?? port;
+      this.appPort = process.env.PORT ? Number(process.env.PORT) : port;
 
       /**
        * Create server
@@ -333,25 +343,40 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
       await this.init.beforeServerListening?.(server);
 
       // Start app
-      await server.listen(PORT, async () => {
+      await server.listen(this.appPort, async () => {
         // set app started
         this.appStarted = true;
 
         // call after start callback
         if (this.init.afterStart) {
-          await this.init.afterStart(this.app, server, Number(PORT));
-        } else {
-          console.log(
-            colors.green(`${this.init.appName ?? "NOREA API"}`.toUpperCase())
-          );
-          console.log(
-            colors.green("====================================================")
-          );
-          console.log("App name:", this.app.appName);
-          console.log("Express server listening port:", PORT);
-          console.log(`Environement :`, process.env.NODE_ENV || "local");
+          await this.init.afterStart(this.app, server, this.appPort);
         }
+
+        this.info();
       });
     }
+  }
+
+  /**
+   * Say
+   */
+  info() {
+    console.log("\n");
+    console.log(
+      colors.green("====================================================")
+    );
+    console.log(
+      colors.green(`${this.app.appName ?? "NOREA API"}`.toUpperCase())
+    );
+    console.log(
+      colors.green("====================================================")
+    );
+    console.log("App name:", this.app.appName);
+    console.log("Express server listening port:", this.appPort);
+    console.log(`Environement :`, process.env.NODE_ENV || "local");
+    console.log("CPUs", cpus().length);
+    console.log(
+      colors.green("-------------------------------------------------------\n")
+    );
   }
 }
