@@ -8,11 +8,11 @@ export enum WorkerPoolHelperEventType {
   "WORKER_TASK" = "WORKER_TASK",
   "INITIALIZATION_ORDER" = "INITIALIZATION_ORDER",
 }
-export type WorkerPoolInstanceStatus =
-  | "initialized"
-  | "terminated"
-  | "pending"
-  | "busy";
+export enum WorkerPoolInstanceStatus {
+  "initialized" = "initialized",
+  "pending" = "pending",
+  "busy" = "busy",
+}
 export type WorkerPoolHelperMetrics = {
   totalWorkers: number;
   busyWorkers: number;
@@ -218,8 +218,8 @@ export default class WorkerPoolHelper {
 
     this._metrics = {
       activeTasks: countOnlineStatus(true),
-      busyWorkers: countStatus("busy"),
-      pendingWorkers: countStatus("pending"),
+      busyWorkers: countStatus(WorkerPoolInstanceStatus.busy),
+      pendingWorkers: countStatus(WorkerPoolInstanceStatus.pending),
       pendingTasks: this._pendingTasks.length,
       totalWorkers: this._metrics.totalWorkers,
     };
@@ -231,7 +231,10 @@ export default class WorkerPoolHelper {
    */
   private static nextPendingWorker() {
     for (const worker of this._workers) {
-      if (this._workersStatus.get(worker.threadId) === "pending") {
+      if (
+        this._workersStatus.get(worker.threadId) ===
+        WorkerPoolInstanceStatus.pending
+      ) {
         return worker;
       }
     }

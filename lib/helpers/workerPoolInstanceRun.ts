@@ -1,9 +1,18 @@
 import { parentPort, MessagePort } from "worker_threads";
-import { WorkerPoolHelperEventType } from "./WorkerPoolHelper";
+import {
+  WorkerPoolHelperEventType,
+  WorkerPoolInstanceStatus,
+} from "./WorkerPoolHelper";
 
 export type WorkerPoolInstanceRunFuncParams = {
+  /**
+   * Pool instance initialization method
+   */
   initialize?: (messagePort: MessagePort) => void | Promise<void>;
-  onTask: (args) => void | Promise<void>;
+  /**
+   * Task execution function
+   */
+  onTask: (args, messagePort: MessagePort) => void | Promise<void>;
 };
 
 /**
@@ -18,7 +27,7 @@ export const workerPoolInstanceRun = (
     // update the status
     parentPort.postMessage({
       type: WorkerPoolHelperEventType.WORKER_STATUS,
-      status: "initialized",
+      status: WorkerPoolInstanceStatus.initialized,
     });
 
     // first pending state
@@ -40,7 +49,7 @@ export const workerPoolInstanceRun = (
         if (!firstPendingThrowed) {
           parentPort.postMessage({
             type: WorkerPoolHelperEventType.WORKER_STATUS,
-            status: "pending",
+            status: WorkerPoolInstanceStatus.pending,
           });
         }
       }
@@ -50,19 +59,19 @@ export const workerPoolInstanceRun = (
         // busy
         parentPort.postMessage({
           type: WorkerPoolHelperEventType.WORKER_STATUS,
-          status: "busy",
+          status: WorkerPoolInstanceStatus.busy,
         });
 
         if (typeof (options.onTask as any).then === "function") {
-          await options.onTask(params.data);
+          await options.onTask(params.data, parentPort);
         } else {
-          options.onTask(params.data);
+          options.onTask(params.data, parentPort);
         }
 
         // update the status
         parentPort.postMessage({
           type: WorkerPoolHelperEventType.WORKER_STATUS,
-          status: "pending",
+          status: WorkerPoolInstanceStatus.pending,
         });
       }
     });
