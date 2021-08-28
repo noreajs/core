@@ -1,8 +1,7 @@
-import apiRoutes from "./api-routes";
-import { NoreaBootstrap } from "../NoreaBootstrap";
 import WorkerPoolHelper from "../helpers/WorkerPoolHelper";
-import { cpus, isMainThread, workerEmit } from "workerpool";
-import Logger from "../helpers/Logger";
+import { NoreaBootstrap } from "../NoreaBootstrap";
+import apiRoutes from "./api-routes";
+import { isMainThread } from "worker_threads";
 
 /**
  * Create a new NoreaJs App
@@ -10,25 +9,18 @@ import Logger from "../helpers/Logger";
 const bootstrap = new NoreaBootstrap(apiRoutes);
 
 bootstrap.afterStart(async (app, server, port) => {
-  WorkerPoolHelper.initWithPath(`${__dirname}/worker.js`, {
-    workerType: "thread",
-    maxWorkers: cpus,
+  WorkerPoolHelper.init({
+    workerInstanceFilePath: `./dist/test-server/worker.js`,
+    logInstanceErrors: true,
+    workerPendingByDefault: true
   });
 
-  WorkerPoolHelper.exec("eventExample", [10], {
-    on: (p) => {
-      console.log(p);
-    },
-  });
+  WorkerPoolHelper.assignTask(10);
 
-  WorkerPoolHelper.exec("eventExample", [150], {
-    on: (p) => {
-      console.log(p);
-    },
-  });
+  WorkerPoolHelper.assignTask(15);
 
   console.log("is master", isMainThread);
-  console.log("stats", WorkerPoolHelper.pool.stats());
+  console.log("stats", WorkerPoolHelper.stats);
 });
 
 bootstrap.beforeStart(async (app) => {

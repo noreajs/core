@@ -2,11 +2,13 @@ import { isMaster } from "cluster";
 import { cpus } from "os";
 import { parentPort, Worker, WorkerOptions } from "worker_threads";
 import Logger from "./Logger";
-
 export type EventListenerType = "error" | "message" | "exit" | "online";
-export type WorkerPoolHelperEventType = "WORKER_STATUS";
+export enum WorkerPoolHelperEventType {
+  "WORKER_STATUS" = "WORKER_STATUS",
+  "WORKER_TASK" = "WORKER_TASK",
+  "INITIALIZATION_ORDER" = "INITIALIZATION_ORDER",
+}
 export type WorkerPoolInstanceStatus =
-  | "initializing"
   | "initialized"
   | "terminated"
   | "pending"
@@ -31,9 +33,10 @@ export type WorkerPoolHelperInitFuncParams = {
   workerInstanceOptions?: WorkerOptions;
   logInstanceErrors?: boolean;
   registeredEvents?: WorkerPoolHelperRegisteredEvents;
+  workerPendingByDefault?: boolean;
 };
 
-export class WorkerPoolHelper {
+export default class WorkerPoolHelper {
   private static _pendingTasks: any[] = [];
   private static _workers: Set<Worker> = new Set<Worker>();
   private static _workersStatus: Map<number, WorkerPoolInstanceStatus> =
@@ -51,6 +54,7 @@ export class WorkerPoolHelper {
   };
   private static _workerInstanceParams: WorkerInstanceParams;
   private static _logInstanceErrors: boolean = false;
+  private static _workerPendingByDefault: boolean = false;
   private static _registeredEvents?: WorkerPoolHelperRegisteredEvents;
 
   public static init(params: WorkerPoolHelperInitFuncParams) {
@@ -74,6 +78,7 @@ export class WorkerPoolHelper {
       options: params.workerInstanceOptions,
     };
     this._registeredEvents = params.registeredEvents;
+    this._workerPendingByDefault = params.workerPendingByDefault ?? false;
 
     // initialize workers
     this._initializeWorkers();
@@ -123,7 +128,7 @@ export class WorkerPoolHelper {
       );
 
       workerInstance.on("message", async (payload) => {
-        if (payload.type === "WORKER_STATUS") {
+        if (payload.type === WorkerPoolHelperEventType.WORKER_STATUS) {
           this._workersStatus.set(workerInstance.threadId, payload.status);
 
           // update metrics
@@ -143,6 +148,13 @@ export class WorkerPoolHelper {
 
         // update metrics
         this._updateMetrics();
+
+        // require pending initialization
+        if (this._workerPendingByDefault) {
+          workerInstance.postMessage({
+            type: WorkerPoolHelperEventType.INITIALIZATION_ORDER,
+          });
+        }
 
         // call registered event listener if exists
         await callRegisteredEventListener("online", undefined);
@@ -247,7 +259,10 @@ export class WorkerPoolHelper {
   public static assignTask(payload: any): boolean {
     var worker = this.nextPendingWorker();
     if (worker) {
-      worker.postMessage(payload);
+      worker.postMessage({
+        type: WorkerPoolHelperEventType.WORKER_TASK,
+        data: payload,
+      });
       return true;
     } else {
       // add to pending task list
