@@ -328,7 +328,6 @@ export default class WorkerPoolHelper {
     added: boolean;
     pendingTasks: number;
   } {
-    console.log("hey", this._metrics.pendingTasks);
     // notify pending
     this._pendingTasksNotification();
 
