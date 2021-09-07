@@ -319,7 +319,10 @@ export default class WorkerPoolHelper {
    * Assign a task to the first free worker
    * @param payload payload for the tast
    */
-  public static assignTask(payload: any): boolean {
+  public static assignTask(payload: any): {
+    added: boolean;
+    pendingTasks: number;
+  } {
     // notify pending
     this._pendingTasksNotification();
 
@@ -332,7 +335,10 @@ export default class WorkerPoolHelper {
         type: WorkerPoolHelperEventType.WORKER_TASK,
         data: payload,
       });
-      return true;
+      return {
+        added: true,
+        pendingTasks: this._metrics.pendingTasks,
+      };
     } else {
       // add to pending task list
       this._pendingTasks.push(payload);
@@ -340,7 +346,10 @@ export default class WorkerPoolHelper {
       // update metrics
       this._updateMetrics();
 
-      return false;
+      return {
+        added: false,
+        pendingTasks: this._metrics.pendingTasks,
+      };
     }
   }
 
