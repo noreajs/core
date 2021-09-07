@@ -160,10 +160,10 @@ export default class WorkerPoolHelper {
           if (!isMaster) {
             parentPort?.postMessage(payload);
           }
-        }
 
-        // call registered event listener if exists
-        await callRegisteredEventListener("message", payload);
+          // call registered event listener if exists
+          await callRegisteredEventListener("message", payload);
+        }
       });
 
       workerInstance.on("online", async () => {
@@ -291,27 +291,20 @@ export default class WorkerPoolHelper {
         // notify
         Logger.log(
           `${this._poolName} >> pending tasks updates notification:`,
-          this.stats
+          this._metrics
         );
         // notify
-        Logger.log(
-          `${this._poolName} >> memory usage:`,
-          {
-            arrayBuffers: numeral(process.memoryUsage().arrayBuffers).format(
-              "0.000 ib"
-            ),
-            external: numeral(process.memoryUsage().external).format(
-              "0.000 ib"
-            ),
-            heapTotal: numeral(process.memoryUsage().heapTotal).format(
-              "0.000 ib"
-            ),
-            heapUsed: numeral(process.memoryUsage().heapUsed).format(
-              "0.000 ib"
-            ),
-            rss: numeral(process.memoryUsage().rss).format("0.000 ib"),
-          }
-        );
+        Logger.log(`${this._poolName} >> memory usage:`, {
+          arrayBuffers: numeral(process.memoryUsage().arrayBuffers).format(
+            "0.000 ib"
+          ),
+          external: numeral(process.memoryUsage().external).format("0.000 ib"),
+          heapTotal: numeral(process.memoryUsage().heapTotal).format(
+            "0.000 ib"
+          ),
+          heapUsed: numeral(process.memoryUsage().heapUsed).format("0.000 ib"),
+          rss: numeral(process.memoryUsage().rss).format("0.000 ib"),
+        });
 
         // update state
         this._pendingTasksUpdatesNotified = true;

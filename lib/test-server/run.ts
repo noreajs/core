@@ -9,16 +9,37 @@ import { isMainThread } from "worker_threads";
 const bootstrap = new NoreaBootstrap(apiRoutes);
 
 bootstrap.afterStart(async (app, server, port) => {
+  var count = [];
   WorkerPoolHelper.init({
     workerInstanceFilePath: `./dist/test-server/worker.js`,
     logInstanceErrors: true,
     workerPendingByDefault: true,
-    pendingTasksNotificationOffset: 600,
+    pendingTasksNotificationOffset: 1000,
+    registeredEvents: {
+      online: async () => {
+        count.push(0);
+        // console.log("online baba", count.length);
+        for (let index = 0; index < 1000; index++) {
+          WorkerPoolHelper.assignTask(Math.ceil(Math.random() * 10));
+        }
+        // console.log("online baba count", WorkerPoolHelper.stats.pendingTasks);
+      },
+      message: (payload) => {
+        if (payload.type === "memory_usage") {
+          // console.log(
+          //   `Worker \`${payload.threadId}\` memory usage update delay(${payload.delay}) => `,
+          //   payload.data
+          // );
+          // console.log(
+          //   `Worker \`${payload.threadId}\` pool metrics`,
+          //   WorkerPoolHelper.stats
+          // );
+        }
+      },
+    },
   });
 
-  WorkerPoolHelper.assignTask(10);
-
-  WorkerPoolHelper.assignTask(15);
+  // WorkerPoolHelper.assignTask(Math.ceil(Math.random() * 10));
 
   console.log("is master", isMainThread);
   console.log("stats", WorkerPoolHelper.stats);
