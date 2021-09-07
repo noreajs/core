@@ -34,9 +34,27 @@ export type WorkerPoolHelperInitFuncParams = {
   logInstanceErrors?: boolean;
   registeredEvents?: WorkerPoolHelperRegisteredEvents;
   workerPendingByDefault?: boolean;
+  poolName?: string;
+  pendingTasksNotificationOffset?: number;
 };
 
 export default class WorkerPoolHelper {
+  private static _pendingTasksNotificationOffset: number = 500;
+  private static _poolName: string = "WorkerPoolHelper";
+
+  public static get poolName(): string {
+    return this._poolName;
+  }
+
+  public static set pendingTasksNotificationOffset(v: number) {
+    this._pendingTasksNotificationOffset = v;
+  }
+
+  public static get pendingTasksNotificationOffset(): number {
+    return this._pendingTasksNotificationOffset;
+  }
+
+  private static _pendingTasksUpdatesNotified = false;
   private static _pendingTasks: any[] = [];
   private static _workers: Set<Worker> = new Set<Worker>();
   private static _workersStatus: Map<number, WorkerPoolInstanceStatus> =
@@ -79,6 +97,10 @@ export default class WorkerPoolHelper {
     };
     this._registeredEvents = params.registeredEvents;
     this._workerPendingByDefault = params.workerPendingByDefault ?? false;
+    this._poolName = params.poolName ?? this._poolName;
+    this._pendingTasksNotificationOffset =
+      params.pendingTasksNotificationOffset ??
+      this._pendingTasksNotificationOffset;
 
     // initialize workers
     this._initializeWorkers();
@@ -256,11 +278,42 @@ export default class WorkerPoolHelper {
   }
 
   /**
+   * Pending tasks notification
+   */
+  private static _pendingTasksNotification() {
+    // limit reached
+    if (
+      this._pendingTasks.length % this._pendingTasksNotificationOffset ===
+      0
+    ) {
+      if (!this._pendingTasksUpdatesNotified) {
+        // notify
+        Logger.log(
+          `[${this._pendingTasksNotificationOffset}] - ${this._poolName} >> pending tasks updates notification:`,
+          this.stats
+        );
+
+        // update state
+        this._pendingTasksUpdatesNotified = true;
+      }
+    } else {
+      // update state
+      this._pendingTasksUpdatesNotified = false;
+    }
+  }
+
+  /**
    * Assign a task to the first free worker
    * @param payload payload for the tast
    */
   public static assignTask(payload: any): boolean {
+    // notify pending
+    this._pendingTasksNotification();
+
+    // load worker
     var worker = this.nextPendingWorker();
+
+    // worker exists
     if (worker) {
       worker.postMessage({
         type: WorkerPoolHelperEventType.WORKER_TASK,
@@ -273,8 +326,9 @@ export default class WorkerPoolHelper {
 
       // update metrics
       this._updateMetrics();
+
+      return false;
     }
-    return false;
   }
 
   /**

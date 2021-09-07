@@ -12,7 +12,8 @@ bootstrap.afterStart(async (app, server, port) => {
   WorkerPoolHelper.init({
     workerInstanceFilePath: `./dist/test-server/worker.js`,
     logInstanceErrors: true,
-    workerPendingByDefault: true
+    workerPendingByDefault: true,
+    pendingTasksNotificationOffset: 600,
   });
 
   WorkerPoolHelper.assignTask(10);

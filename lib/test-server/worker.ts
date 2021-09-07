@@ -5,7 +5,7 @@ const run = workerPoolInstanceRun({
   initialize: () => {
     Logger.log("Initializing....");
   },
-  onTask: (delay) => {
+  onTask: async function (delay) {
     console.log("hey your delay", delay);
   },
 });

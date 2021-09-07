@@ -35,11 +35,7 @@ export const workerPoolInstanceRun = (
 
     // call the initialize method
     if (options.initialize !== null && options.initialize !== null) {
-      if (typeof (options.initialize as any).then === "function") {
-        await options.initialize(parentPort);
-      } else {
-        options.initialize(parentPort);
-      }
+      await options.initialize(parentPort);
     }
 
     // listen to message
@@ -62,11 +58,7 @@ export const workerPoolInstanceRun = (
           status: WorkerPoolInstanceStatus.busy,
         });
 
-        if (typeof (options.onTask as any).then === "function") {
-          await options.onTask(params.data, parentPort);
-        } else {
-          options.onTask(params.data, parentPort);
-        }
+        await options.onTask(params.data, parentPort);
 
         // update the status
         parentPort.postMessage({
