@@ -1,87 +1,63 @@
 import { isMaster } from "cluster";
-import { cpus } from "os";
 import numeral from "numeral";
-import { parentPort, Worker, WorkerOptions } from "worker_threads";
-import Logger from "./Logger";
-import WorkerHelperRegisteredEvents from "../interfaces/WorkerHelperRegisteredEvents";
+import { cpus } from "os";
+import { parentPort, Worker } from "worker_threads";
+import {
+  Logger,
+  WorkerInstanceParams,
+  WorkerPoolHelperEventType,
+  WorkerPoolHelperInitFuncParams,
+  WorkerPoolHelperMetrics,
+  WorkerPoolInstanceStatus,
+} from "../helpers";
+import { WorkerHelperRegisteredEvents } from "../interfaces";
 
-export enum WorkerPoolHelperEventType {
-  "WORKER_STATUS" = "WORKER_STATUS",
-  "WORKER_TASK" = "WORKER_TASK",
-  "INITIALIZATION_ORDER" = "INITIALIZATION_ORDER",
-}
+export default class ExtendedWorkerPoolHelper {
+  private _pendingTasksNotificationOffset: number = 500;
+  private _poolName: string = "WorkerPoolHelper";
 
-export enum WorkerPoolInstanceStatus {
-  "initialized" = "initialized",
-  "pending" = "pending",
-  "busy" = "busy",
-}
-
-export type WorkerPoolHelperMetrics = {
-  totalWorkers: number;
-  busyWorkers: number;
-  pendingWorkers: number;
-  pendingTasks: number;
-  activeTasks: number;
-};
-export type WorkerInstanceParams = {
-  filePath: string;
-  options?: WorkerOptions;
-};
-export type WorkerPoolHelperInitFuncParams = {
-  workersCount?: number;
-  workerInstanceFilePath: string;
-  workerInstanceOptions?: WorkerOptions;
-  logInstanceErrors?: boolean;
-  registeredEvents?: WorkerHelperRegisteredEvents;
-  workerPendingByDefault?: boolean;
-  poolName?: string;
-  pendingTasksNotificationOffset?: number;
-};
-
-export default class WorkerPoolHelper {
-  private static _pendingTasksNotificationOffset: number = 500;
-  private static _poolName: string = "WorkerPoolHelper";
-
-  public static get poolName(): string {
+  public get poolName(): string {
     return this._poolName;
   }
 
-  public static set pendingTasksNotificationOffset(v: number) {
+  public set pendingTasksNotificationOffset(v: number) {
     this._pendingTasksNotificationOffset = v;
   }
 
-  public static get pendingTasksNotificationOffset(): number {
+  public get pendingTasksNotificationOffset(): number {
     return this._pendingTasksNotificationOffset;
   }
 
-  private static _pendingTasksUpdatesNotified = false;
-  private static _pendingTasks: any[] = [];
+  private _pendingTasksUpdatesNotified = false;
+  private _pendingTasks: any[] = [];
 
-  public static get pendingTasks(): any[] {
-    return this._pendingTasks;
-  }
+  
+  public get pendingTasks() : any[] {
+      return this._pendingTasks;
+  }  
 
-  private static _workers: Set<Worker> = new Set<Worker>();
-  private static _workersStatus: Map<number, WorkerPoolInstanceStatus> =
-    new Map<number, WorkerPoolInstanceStatus>();
-  private static _workersOnlineStatus: Map<number, boolean> = new Map<
+  private _workers: Set<Worker> = new Set<Worker>();
+  private _workersStatus: Map<number, WorkerPoolInstanceStatus> = new Map<
+    number,
+    WorkerPoolInstanceStatus
+  >();
+  private _workersOnlineStatus: Map<number, boolean> = new Map<
     number,
     boolean
   >();
-  private static _metrics: WorkerPoolHelperMetrics = {
+  private _metrics: WorkerPoolHelperMetrics = {
     activeTasks: 0,
     busyWorkers: 0,
     pendingWorkers: 0,
     pendingTasks: 0,
     totalWorkers: 0,
   };
-  private static _workerInstanceParams: WorkerInstanceParams;
-  private static _logInstanceErrors: boolean = false;
-  private static _workerPendingByDefault: boolean = false;
-  private static _registeredEvents?: WorkerHelperRegisteredEvents;
+  private _workerInstanceParams: WorkerInstanceParams;
+  private _logInstanceErrors: boolean = false;
+  private _workerPendingByDefault: boolean = false;
+  private _registeredEvents?: WorkerHelperRegisteredEvents;
 
-  public static init(params: WorkerPoolHelperInitFuncParams) {
+  constructor(params: WorkerPoolHelperInitFuncParams) {
     if (
       params.workersCount !== null &&
       params.workersCount !== undefined &&
@@ -112,7 +88,7 @@ export default class WorkerPoolHelper {
     this._initializeWorkers();
   }
 
-  private static _initializeWorkers() {
+  private _initializeWorkers() {
     /**
      * Get registered event listener
      * @param eventName event name
@@ -221,7 +197,7 @@ export default class WorkerPoolHelper {
   /**
    * Update workers metrics
    */
-  private static _updateMetrics() {
+  private _updateMetrics() {
     // count workers status
     const countStatus = (status: WorkerPoolInstanceStatus) => {
       var count = 0;
@@ -257,7 +233,7 @@ export default class WorkerPoolHelper {
    * Get the next pending worker
    * @returns
    */
-  private static nextPendingWorker() {
+  private nextPendingWorker() {
     for (const worker of this._workers) {
       if (
         this._workersStatus.get(worker.threadId) ===
@@ -272,7 +248,7 @@ export default class WorkerPoolHelper {
   /**
    * Watch and run pending tasks
    */
-  private static _watchPendingTasks() {
+  private _watchPendingTasks() {
     const interval = setInterval(() => {
       if (this._pendingTasks.length !== 0) {
         // get the first in task
@@ -280,16 +256,16 @@ export default class WorkerPoolHelper {
         // assign the task
         this.assignTask(firstInTask);
       }
-    }, 500);
+    }, 100);
   }
 
   /**
    * Pending tasks notification
    */
-  private static _pendingTasksNotification() {
+  private _pendingTasksNotification() {
     // limit reached
     if (
-      this._pendingTasks.length % this._pendingTasksNotificationOffset ===
+      this.pendingTasks.length % this._pendingTasksNotificationOffset ===
       0
     ) {
       if (!this._pendingTasksUpdatesNotified) {
@@ -324,11 +300,10 @@ export default class WorkerPoolHelper {
    * Assign a task to the first free worker
    * @param payload payload for the tast
    */
-  public static assignTask(payload: any): {
+  public assignTask(payload: any): {
     added: boolean;
     pendingTasks: number;
   } {
-    console.log("hey", this._metrics.pendingTasks);
     // notify pending
     this._pendingTasksNotification();
 
@@ -362,7 +337,7 @@ export default class WorkerPoolHelper {
   /**
    * Get the pool stats
    */
-  public static get stats(): WorkerPoolHelperMetrics {
+  public get stats(): WorkerPoolHelperMetrics {
     return this._metrics;
   }
 }
