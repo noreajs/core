@@ -34,6 +34,7 @@
     "@types/express-session": "^1.17.0",
     "@types/helmet": "0.0.47",
     "@types/mailgen": "^2.0.5",
+    "@types/numeral": "^2.0.1",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "moment": "^2.29.1",
@@ -45,7 +46,8 @@
     "colors": "^1.4.0",
     "cors": "^2.8.5",
     "helmet": "^3.23.3",
-    "mailgen": "^2.0.13"
+    "mailgen": "^2.0.13",
+    "numeral": "^2.0.6"
   },
   "peerDependencies": {
     "@types/cors": "^2.8.12",

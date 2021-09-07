@@ -1,5 +1,6 @@
 import { isMaster } from "cluster";
 import { cpus } from "os";
+import numeral from "numeral";
 import { parentPort, Worker, WorkerOptions } from "worker_threads";
 import Logger from "./Logger";
 export type EventListenerType = "error" | "message" | "exit" | "online";
@@ -289,8 +290,27 @@ export default class WorkerPoolHelper {
       if (!this._pendingTasksUpdatesNotified) {
         // notify
         Logger.log(
-          `[${this._pendingTasksNotificationOffset}] - ${this._poolName} >> pending tasks updates notification:`,
+          `${this._poolName} >> pending tasks updates notification:`,
           this.stats
+        );
+        // notify
+        Logger.log(
+          `${this._poolName} >> memory usage:`,
+          {
+            arrayBuffers: numeral(process.memoryUsage().arrayBuffers).format(
+              "0.000 ib"
+            ),
+            external: numeral(process.memoryUsage().external).format(
+              "0.000 ib"
+            ),
+            heapTotal: numeral(process.memoryUsage().heapTotal).format(
+              "0.000 ib"
+            ),
+            heapUsed: numeral(process.memoryUsage().heapUsed).format(
+              "0.000 ib"
+            ),
+            rss: numeral(process.memoryUsage().rss).format("0.000 ib"),
+          }
         );
 
         // update state
