@@ -2,6 +2,7 @@ import { isMaster } from "cluster";
 import numeral from "numeral";
 import { cpus } from "os";
 import { parentPort, Worker } from "worker_threads";
+
 import {
   Logger,
   WorkerInstanceParams,
@@ -10,6 +11,7 @@ import {
   WorkerPoolHelperMetrics,
   WorkerPoolInstanceStatus,
 } from "../helpers";
+
 import { WorkerHelperRegisteredEvents } from "../interfaces";
 
 export default class LocalWorkerPoolHelper {

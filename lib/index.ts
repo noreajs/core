@@ -1,4 +1,4 @@
-export { WorkerPoolHelper, Logger, WorkerHelper } from "./helpers";
+export { WorkerPoolHelper, LocalWorkerPoolHelper, Logger, WorkerHelper } from "./helpers";
 export {
   AfterStartFunctionType,
   AppRoutesInitParamsType,
@@ -11,6 +11,8 @@ export {
   RouteGroupParamsType,
   UpdateInitConfigParamType,
   WorkerEventType,
+  WorkerEventListenerType,
+  WorkerHelperRegisteredEvents
 } from "./interfaces";
 export { Middleware } from "./middleware";
 export {
