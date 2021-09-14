@@ -5,7 +5,7 @@ import {
   WorkerOptions,
 } from "worker_threads";
 import WorkerHelperRegisteredEvents from "../interfaces/WorkerHelperRegisteredEvents";
-import Logger from "./Logger";
+import Logger from "../../../helpers/Logger";
 
 export type WorkerHelperInitFuncParams = {
   filePath: string;

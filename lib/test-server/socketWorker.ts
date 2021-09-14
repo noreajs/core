@@ -1,6 +1,6 @@
 import { SocketIOServer } from "@noreajs/realtime";
 import { createAdapter } from "@socket.io/cluster-adapter";
-import { Logger, NoreaBootstrap } from "..";
+import { EcosytemEventEmitter, Logger, NoreaBootstrap } from "..";
 import apiRoutes from "./api-routes";
 
 /**
@@ -54,6 +54,8 @@ bootstrap.afterStart((app, server) => {
       console.log("socketIoServer.getServer()", error);
     }
   }, 5000);
+
+  EcosytemEventEmitter.free();
 });
 
 /**

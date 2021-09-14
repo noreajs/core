@@ -1,4 +1,4 @@
-export { WorkerPoolHelper, LocalWorkerPoolHelper, Logger, WorkerHelper } from "./helpers";
+export { LocalWorkerPoolHelper, Logger, WorkerHelper } from "./helpers";
 export {
   AfterStartFunctionType,
   AppRoutesInitParamsType,
@@ -10,10 +10,6 @@ export {
   NoreaRouter,
   RouteGroupParamsType,
   UpdateInitConfigParamType,
-  WorkerEventType,
-  WorkerEventListenerType,
-  WorkerHelperRegisteredEvents,
-  EcosystemMap
 } from "./interfaces";
 export { Middleware } from "./middleware";
 export {
@@ -24,6 +20,21 @@ export {
   Notification,
   NotificationConstructorType,
 } from "./modules/notifications";
+export {
+  EcosystemMap,
+  EcosytemEventEmitter,
+  WorkerEventListenerType,
+  WorkerPoolInstanceStatus,
+  WorkerPoolHelperEventType,
+  WorkerHelperRegisteredEvents,
+  WorkerEventType,
+  workerPoolInstanceRun,
+  WorkerPoolInstanceRunFuncParams,
+  WorkerPoolHelperMetrics,
+  WorkerInstanceParams,
+  WorkerPoolHelper,
+  WorkerPoolHelperInitFuncParams,
+} from "./modules/pool";
 export { NoreaApp, NoreaAppInitMethods } from "./NoreaApp";
 export { NoreaBootstrap } from "./NoreaBootstrap";
 export { Rule } from "./request/validation/rules/Rule";

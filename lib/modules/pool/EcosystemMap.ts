@@ -1,5 +1,6 @@
 import cluster, { Worker, ClusterSettings } from "cluster";
 import { cpus } from "os";
+import { WorkerPoolHelperEventType, WorkerPoolInstanceStatus } from ".";
 import { Logger } from "../..";
 
 export type WorkerMap = {
@@ -16,14 +17,32 @@ export type EcosytemWorkers<T = string> = {
   [key in keyof EcosytemScopes]: WorkerMap;
 };
 
+export type EcosytemWorkerStatues = {
+  [workerId: number]: WorkerPoolInstanceStatus;
+};
+
 export default class EcosystemMap<T = string> {
+  private _statues: EcosytemWorkerStatues = {};
   private _scopes: EcosytemScopes = {};
   private _workers: EcosytemWorkers<T> = {};
 
   constructor(scopes: EcosytemScopes) {
     this._scopes = scopes;
+
+    // watch status
+    this.watchStatus();
   }
 
+  /**
+   * Workers statues
+   */
+  public get workerStatues(): EcosytemWorkerStatues {
+    return this._statues;
+  }
+
+  /**
+   * Workers statues
+   */
   public get workerCount(): number {
     var count = 0;
     for (const key of Object.keys(this._workers)) {
@@ -40,6 +59,15 @@ export default class EcosystemMap<T = string> {
   }
 
   /**
+   * Get worker's status
+   * @param workerId worker ID
+   * @returns WorkerPoolInstanceStatus | undefined
+   */
+  workerStatus(workerId: number): WorkerPoolInstanceStatus | undefined {
+    return this._statues[workerId];
+  }
+
+  /**
    * Add many workers at the same time in the ecosystem
    * @param count number of worker
    * @param scope worker scope
@@ -48,6 +76,23 @@ export default class EcosystemMap<T = string> {
   addManyWorkers(count: number, scope: T, settings?: ClusterSettings) {
     for (let index = 0; index < count; index++) {
       this.addWorker(scope, settings);
+    }
+  }
+
+  /**
+   * Watch status
+   */
+  private watchStatus() {
+    if (cluster.isPrimary) {
+      cluster.on("message", (worker, payload) => {
+        if (payload.type === WorkerPoolHelperEventType.WORKER_STATUS) {
+          this._statues[worker.id] = payload.status;
+        }
+      });
+    } else {
+      Logger.err(
+        "`WatchStatus` function can be call only on the `primary` worker."
+      );
     }
   }
 

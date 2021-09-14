@@ -1,21 +1,11 @@
 import cluster from "cluster";
-import { cpus } from "os";
 import numeral from "numeral";
+import { cpus } from "os";
 import { parentPort, Worker, WorkerOptions } from "worker_threads";
-import Logger from "./Logger";
+import { Logger } from "../../..";
 import WorkerHelperRegisteredEvents from "../interfaces/WorkerHelperRegisteredEvents";
-
-export enum WorkerPoolHelperEventType {
-  "WORKER_STATUS" = "WORKER_STATUS",
-  "WORKER_TASK" = "WORKER_TASK",
-  "INITIALIZATION_ORDER" = "INITIALIZATION_ORDER",
-}
-
-export enum WorkerPoolInstanceStatus {
-  "initialized" = "initialized",
-  "pending" = "pending",
-  "busy" = "busy",
-}
+import WorkerPoolHelperEventType from "../interfaces/WorkerPoolHelperEventType";
+import WorkerPoolInstanceStatus from "../interfaces/WorkerPoolInstanceStatus";
 
 export type WorkerPoolHelperMetrics = {
   totalWorkers: number;

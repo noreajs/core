@@ -1,8 +1,6 @@
-import { parentPort, MessagePort } from "worker_threads";
-import {
-  WorkerPoolHelperEventType,
-  WorkerPoolInstanceStatus,
-} from "./WorkerPoolHelper";
+import { MessagePort, parentPort } from "worker_threads";
+import WorkerPoolHelperEventType from "../interfaces/WorkerPoolHelperEventType";
+import WorkerPoolInstanceStatus from "../interfaces/WorkerPoolInstanceStatus";
 
 export type WorkerPoolInstanceRunFuncParams = {
   /**

@@ -1,7 +1,7 @@
 import numeral from "numeral";
 import { Logger } from "../helpers";
 import { threadId } from "worker_threads";
-import { workerPoolInstanceRun } from "../helpers/workerPoolInstanceRun";
+import { workerPoolInstanceRun } from "../modules/pool/helpers/workerPoolInstanceRun";
 
 const run = workerPoolInstanceRun({
   initialize: () => {

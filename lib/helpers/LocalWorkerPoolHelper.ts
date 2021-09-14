@@ -2,17 +2,11 @@ import cluster from "cluster";
 import numeral from "numeral";
 import { cpus } from "os";
 import { parentPort, Worker } from "worker_threads";
-
-import {
-  Logger,
-  WorkerInstanceParams,
-  WorkerPoolHelperEventType,
-  WorkerPoolHelperInitFuncParams,
-  WorkerPoolHelperMetrics,
-  WorkerPoolInstanceStatus,
-} from "../helpers";
-
-import { WorkerHelperRegisteredEvents } from "../interfaces";
+import { WorkerInstanceParams, WorkerPoolHelperInitFuncParams, WorkerPoolHelperMetrics } from "../modules/pool/helpers/WorkerPoolHelper";
+import WorkerHelperRegisteredEvents from "../modules/pool/interfaces/WorkerHelperRegisteredEvents";
+import WorkerPoolHelperEventType from "../modules/pool/interfaces/WorkerPoolHelperEventType";
+import WorkerPoolInstanceStatus from "../modules/pool/interfaces/WorkerPoolInstanceStatus";
+import Logger from "./Logger";
 
 export default class LocalWorkerPoolHelper {
   private _pendingTasksNotificationOffset: number = 500;
