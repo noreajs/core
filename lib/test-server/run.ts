@@ -1,11 +1,24 @@
 import { setupPrimary } from "@socket.io/cluster-adapter";
 import cluster from "cluster";
-import EcosystemMap from "../interfaces/EcosystemMap";
+import EcosystemMap from "../modules/pool/EcosystemMap";
 
 /**
  * ecosystem map
  */
-const ecosystemMap = new EcosystemMap();
+const ecosystemMap = new EcosystemMap<"web" | "socket">({
+  web: {
+    clusterSettings: {
+      exec: "./dist/test-server/webWorker.js",
+      args: ["--use", "https"],
+    },
+  },
+  socket: {
+    clusterSettings: {
+      exec: "./dist/test-server/socketWorker.js",
+      args: ["--use", "http"],
+    },
+  },
+});
 
 if (cluster.isPrimary) {
   console.log(`Master ${process.pid} is running`);
@@ -13,59 +26,18 @@ if (cluster.isPrimary) {
   setupPrimary();
 
   // // web config
-  // cluster.setupPrimary({
-  //   exec: "./dist/test-server/webWorker.js",
-  //   args: ["--use", "https"],
-  // });
 
   // // add web worker
   // ecosystemMap.addWebWorker(cluster.fork());
   // ecosystemMap.addWebWorker(cluster.fork());
 
-  // socket server config
-  cluster.setupPrimary({
-    exec: "./dist/test-server/socketWorker.js",
-    args: ["--use", "http"],
-  });
-
   // add socket server config
-  ecosystemMap.addSocketWorker(cluster.fork());
-  ecosystemMap.addSocketWorker(cluster.fork());
-  ecosystemMap.addSocketWorker(cluster.fork());
-  ecosystemMap.addSocketWorker(cluster.fork());
-  ecosystemMap.addSocketWorker(cluster.fork());
+  ecosystemMap.addManyWorkers(10, "socket");
 
   /**
    * Watch worker exit
    */
-  cluster.on("exit", (worker) => {
-    console.log(`Worker ${worker.process.pid} died`);
-    const workerType = ecosystemMap.getWorkerType(worker.id);
-
-    switch (workerType) {
-      case "socket":
-        // socket server config
-        cluster.setupPrimary({
-          exec: "./dist/test-server/socketWorker.js",
-          args: ["--use", "http"],
-        });
-
-        // add socket server config
-        ecosystemMap.addSocketWorker(cluster.fork());
-        break;
-
-      case "web":
-        // web config
-        cluster.setupPrimary({
-          exec: "./dist/test-server/webWorker.js",
-          args: ["--use", "https"],
-        });
-
-        // add web worker
-        ecosystemMap.addWebWorker(cluster.fork());
-        break;
-    }
-  });
+  ecosystemMap.watchExit();
 } else {
   // hey
 }
