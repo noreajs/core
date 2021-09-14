@@ -236,9 +236,9 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
 
   /**
    * Start your app
-   * @param port server port, default value = 3000
+   * @param port server port, default value
    */
-  public async start(port: number | boolean = 3000) {
+  public async start(port: number | boolean = true) {
     /**
      * Only when the app has not yet started
      */
