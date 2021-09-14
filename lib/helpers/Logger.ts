@@ -8,7 +8,10 @@ export default class Logger {
     if (
       process.env.DEBUG_MODE ? `${process.env.DEBUG_MODE}` === "true" : true
     ) {
-      console.log(message, ...optionalParams);
+      console.log(
+        `[${process.platform} - PID:${process.pid}] ${message}`,
+        ...optionalParams
+      );
     }
   }
 
@@ -18,6 +21,9 @@ export default class Logger {
    * @param optionalParams optional parameters
    */
   public static err(message?: any, ...optionalParams: any[]) {
-    console.log(message, ...optionalParams);
+    console.log(
+      `[${process.platform} - PID:${process.pid}] ${message}`,
+      ...optionalParams
+    );
   }
 }

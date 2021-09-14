@@ -1,4 +1,4 @@
-import { isMaster } from "cluster";
+import cluster from "cluster";
 import numeral from "numeral";
 import { cpus } from "os";
 import { parentPort, Worker } from "worker_threads";
@@ -139,7 +139,7 @@ export default class LocalWorkerPoolHelper {
           // update metrics
           this._updateMetrics();
         } else {
-          if (!isMaster) {
+          if (!cluster.isPrimary) {
             parentPort?.postMessage(payload);
           }
 

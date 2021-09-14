@@ -9,6 +9,7 @@
         "sourceMap": false,
         "outDir": "dist",
         "declaration": true,
+        "skipLibCheck": true,
         "noImplicitThis": true
     }
 }

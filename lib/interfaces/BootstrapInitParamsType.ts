@@ -1,20 +1,25 @@
-import cors from "cors";
-import http from "http";
-import https from "http";
 import bodyParser from "body-parser";
-import { IHelmetConfiguration } from "helmet";
+import cors from "cors";
 import { SessionOptions } from "express-session";
-import INoreaBootstrap, {
-  BeforeInitFunctionType,
-  BeforeStartFunctionType,
+import { IHelmetConfiguration } from "helmet";
+import { default as http, default as https } from "http";
+import { NoreaApplication } from ".";
+import {
   AfterStartFunctionType,
+  BeforeInitFunctionType,
   BeforeServerListeningFunctionType,
+  BeforeStartFunctionType,
 } from "./INoreaBootstrap";
 
 /**
  * Norea.Js app initialisation's parameter type
  */
 declare type BootstrapInitParamsType<T> = {
+  /**
+   * Express application
+   */
+  app?: NoreaApplication;
+
   /**
    * App name
    */
@@ -42,10 +47,12 @@ declare type BootstrapInitParamsType<T> = {
 
   /**
    * Called before the server starts listening
-   * 
+   *
    * @param {http.Server | https.Server} server - The current server
    */
-  beforeServerListening?: BeforeServerListeningFunctionType<http.Server | https.Server>;
+  beforeServerListening?: BeforeServerListeningFunctionType<
+    http.Server | https.Server
+  >;
 
   /**
    * This method is executed during the initialization of the application (extension of express application).
@@ -114,6 +121,13 @@ declare type BootstrapInitParamsType<T> = {
    *
    */
   afterStart?: AfterStartFunctionType<T>;
+
+  /**
+   * Enbale cors
+   * https://www.npmjs.com/package/cors
+   * @default true
+   */
+  enableCors?: boolean;
 
   /**
    * CORS options

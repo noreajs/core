@@ -1,4 +1,4 @@
-import { isMaster } from "cluster";
+import cluster from "cluster";
 import numeral from "numeral";
 import { cpus } from "os";
 import { parentPort, Worker } from "worker_threads";
@@ -31,10 +31,9 @@ export default class ExtendedWorkerPoolHelper {
   private _pendingTasksUpdatesNotified = false;
   private _pendingTasks: any[] = [];
 
-  
-  public get pendingTasks() : any[] {
-      return this._pendingTasks;
-  }  
+  public get pendingTasks(): any[] {
+    return this._pendingTasks;
+  }
 
   private _workers: Set<Worker> = new Set<Worker>();
   private _workersStatus: Map<number, WorkerPoolInstanceStatus> = new Map<
@@ -138,7 +137,7 @@ export default class ExtendedWorkerPoolHelper {
           // update metrics
           this._updateMetrics();
         } else {
-          if (!isMaster) {
+          if (!cluster.isPrimary) {
             parentPort?.postMessage(payload);
           }
 
@@ -264,10 +263,7 @@ export default class ExtendedWorkerPoolHelper {
    */
   private _pendingTasksNotification() {
     // limit reached
-    if (
-      this.pendingTasks.length % this._pendingTasksNotificationOffset ===
-      0
-    ) {
+    if (this.pendingTasks.length % this._pendingTasksNotificationOffset === 0) {
       if (!this._pendingTasksUpdatesNotified) {
         // notify
         Logger.log(

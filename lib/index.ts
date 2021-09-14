@@ -12,7 +12,8 @@ export {
   UpdateInitConfigParamType,
   WorkerEventType,
   WorkerEventListenerType,
-  WorkerHelperRegisteredEvents
+  WorkerHelperRegisteredEvents,
+  EcosystemMap
 } from "./interfaces";
 export { Middleware } from "./middleware";
 export {

@@ -18,11 +18,16 @@ export default new AppRoutes({
         /**
          * Login
          */
-        module.route("/login").get((req: Request, res: Response) => {
-          throw "hello world.. Fuck you";
-
-          res.status(200).send({
+        module.route("/login").get(async (req: Request, res: Response) => {
+          // throw "hello world.. Fuck you";
+          // await new Promise((resolve, rejct) => {
+          //   setTimeout(() => {
+          //     resolve(true);
+          //   }, Math.round(Math.random() * 10 * 1000));
+          // });
+          return res.status(200).send({
             message: "Login",
+            workerId: process.pid,
           });
         });
 

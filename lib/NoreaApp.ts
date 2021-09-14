@@ -2,7 +2,7 @@ import express, { Application } from "express";
 import cors from "cors";
 import http from "http";
 import https from "http";
-import bodyParser from "body-parser";
+import { json, urlencoded, OptionsUrlencoded, OptionsJson } from "body-parser";
 import NoreaAppRoutes from "./route/NoreaAppRoutes";
 
 /**
@@ -75,13 +75,13 @@ export type NoreaAppInitMethods = {
    * Body parser json options
    * https://www.npmjs.com/package/body-parser
    */
-  bodyParserJsonOptions?: bodyParser.OptionsJson;
+  bodyParserJsonOptions?: OptionsJson;
 
   /**
    * Body parser URL encoded options
    * https://www.npmjs.com/package/body-parser
    */
-  bodyParserUrlEncodedOptions?: bodyParser.OptionsUrlencoded;
+  bodyParserUrlEncodedOptions?: OptionsUrlencoded;
 };
 
 /**
@@ -124,17 +124,15 @@ export class NoreaApp {
     // init cors
     this.app.use(cors(this.init.corsOptions));
     // support application/json type post data
-    this.app.use(bodyParser.json(this.init.bodyParserJsonOptions));
+    this.app.use(json(this.init.bodyParserJsonOptions) as any);
     //support application/x-www-form-urlencoded post data
     if (this.init.bodyParserUrlEncodedOptions) {
       const { extended, ...rest } = this.init.bodyParserUrlEncodedOptions;
-      this.app.use(
-        bodyParser.urlencoded({ extended: extended ?? false, ...rest })
-      );
+      this.app.use(urlencoded({ extended: extended ?? false, ...rest }) as any);
     } else {
-      this.app.use(bodyParser.urlencoded({ extended: false }));
+      this.app.use(urlencoded({ extended: false }) as any);
     }
-    
+
     // before start callback
     if (this.init.beforeStart) {
       this.init.beforeStart(this.app);
@@ -157,9 +155,9 @@ export class NoreaApp {
     // default server
     const defaultServer = process.env.NODE_ENV ? https.Server : http.Server;
     // new server instance
-    const server = new (this.init.forceHttps === true
-      ? https.Server
-      : defaultServer)(this.app);
+    const server = new (
+      this.init.forceHttps === true ? https.Server : defaultServer
+    )(this.app);
 
     // Start app
     server.listen(PORT, () => {

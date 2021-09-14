@@ -6,6 +6,7 @@ import session from "express-session";
 import helmet from "helmet";
 import { default as http, default as https } from "http";
 import { Server } from "https";
+import cluster from "cluster";
 import { cpus } from "os";
 import ExpressParser from "./helpers/ExpressParser";
 import {
@@ -74,9 +75,9 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
     init?: BootstrapInitMethods<NoreaApplication>
   ) {
     // set app
-    this.app = ExpressParser.parseApplication(express(), {
-      appName: init?.appName,
-      secretKey: init?.secretKey,
+    this.app = ExpressParser.parseApplication(init?.app ?? express(), {
+      appName: init?.appName ?? init?.app?.appName,
+      secretKey: init?.secretKey ?? init?.app?.secretKey,
     });
 
     // set routes
@@ -130,6 +131,7 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
       );
     } else {
       const {
+        app,
         afterStart,
         beforeServerListening,
         beforeStart,
@@ -137,6 +139,7 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
         ...initRest
       } = this.init;
       this.init = {
+        app,
         afterStart,
         beforeInit,
         beforeStart,
@@ -155,8 +158,9 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
       /**
        * Update app informations
        */
-      this.app.appName = setting.appName ?? initRest.appName;
-      this.app.secretKey = setting.appName ?? initRest.appName;
+      this.app.appName = setting.appName ?? initRest.appName ?? app?.appName;
+      this.app.secretKey =
+        setting.appName ?? initRest.appName ?? app?.secretKey;
     }
   }
 
@@ -234,7 +238,7 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
    * Start your app
    * @param port server port, default value = 3000
    */
-  public async start(port: number = 3000) {
+  public async start(port: number | boolean = 3000) {
     /**
      * Only when the app has not yet started
      */
@@ -248,17 +252,21 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
       this.app.use(helmet(this.init.helmetConfig));
 
       // init cors
-      this.app.use(cors(this.init.corsOptions));
+      if (this.init.enableCors !== false) {
+        this.app.use(cors(this.init.corsOptions));
+      }
 
       // support application/json type post data
-      this.app.use(json(this.init.bodyParserJsonOptions));
+      this.app.use(json(this.init.bodyParserJsonOptions) as any);
 
       //support application/x-www-form-urlencoded post data
       if (this.init.bodyParserUrlEncodedOptions) {
         const { extended, ...rest } = this.init.bodyParserUrlEncodedOptions;
-        this.app.use(urlencoded({ extended: extended ?? false, ...rest }));
+        this.app.use(
+          urlencoded({ extended: extended ?? false, ...rest }) as any
+        );
       } else {
-        this.app.use(urlencoded({ extended: false }));
+        this.app.use(urlencoded({ extended: false }) as any);
       }
 
       // express session
@@ -316,8 +324,23 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
        */
       this.app.use(Middleware.errorResponseInJson);
 
-      // App port
-      this.appPort = process.env.PORT ? Number(process.env.PORT) : port;
+      if (typeof port === "boolean") {
+        if (port === false) {
+          // App port
+          this.appPort = undefined;
+        } else {
+          // App port
+          this.appPort = process.env.PORT
+            ? Number(process.env.PORT)
+            : undefined;
+        }
+      } else if (typeof port === "number") {
+        // App port
+        this.appPort = port;
+      } else {
+        // App port
+        this.appPort = process.env.PORT ? Number(process.env.PORT) : undefined;
+      }
 
       /**
        * Create server
@@ -347,7 +370,7 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
         // set app started
         this.appStarted = true;
 
-        this.info();
+        this.info(server);
 
         // call after start callback
         if (this.init.afterStart) {
@@ -360,23 +383,34 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
   /**
    * Say
    */
-  info() {
-    console.log("\n");
+  info(server: http.Server | https.Server) {
     console.log(
-      colors.green("====================================================")
-    );
-    console.log(
-      colors.green(`${this.app.appName ?? "NOREA API"}`.toUpperCase())
-    );
-    console.log(
-      colors.green("====================================================")
-    );
-    console.log("App name:", this.app.appName);
-    console.log("Express server listening port:", this.appPort);
-    console.log(`Environement :`, process.env.NODE_ENV || "local");
-    console.log("CPUs", cpus().length);
-    console.log(
-      colors.green("-------------------------------------------------------\n")
+      "\r\n",
+      colors.green(`${this.app.appName ?? "NOREA API"}`.toUpperCase()),
+      "\r\n",
+      colors.green("===================================================="),
+      "\r\n",
+      "App name:",
+      this.app.appName,
+      "\r\n",
+      "Express server listening port:",
+      this.appPort ?? server.address(),
+      "\r\n",
+      "Master:",
+      cluster.isPrimary,
+      "\r\n",
+      "Worker:",
+      { isWorker: cluster.isWorker, workerId: cluster.worker?.id },
+      "\r\n",
+      `Environement :`,
+      process.env.NODE_ENV || "local",
+      "\r\n",
+      "CPUs:",
+      cpus().length,
+      "\r\n",
+      `pid:`,
+      process.pid,
+      "\r\n"
     );
   }
 }

@@ -1,83 +1,71 @@
-import { WorkerHelper, WorkerPoolHelper } from "..";
-import { NoreaBootstrap } from "../NoreaBootstrap";
-import apiRoutes from "./api-routes";
+import { setupPrimary } from "@socket.io/cluster-adapter";
+import cluster from "cluster";
+import EcosystemMap from "../interfaces/EcosystemMap";
 
 /**
- * Create a new NoreaJs App
+ * ecosystem map
  */
-const bootstrap = new NoreaBootstrap(apiRoutes);
+const ecosystemMap = new EcosystemMap();
 
-bootstrap.afterStart(async (app, server, port) => {
-  var count = [];
-  // intiate pool
-  WorkerPoolHelper.init({
-    workerInstanceFilePath: `./dist/test-server/worker.js`,
-    logInstanceErrors: true,
-    workerPendingByDefault: true,
-    pendingTasksNotificationOffset: 100,
-    registeredEvents: {
-      online: async () => {
-        // count.push(0);
-        // console.log("online baba", count.length);
-        // for (let index = 0; index < 1000; index++) {
-        //   WorkerPoolHelper.assignTask(Math.ceil(Math.random() * 10));
-        // }
-        // console.log("online baba count", WorkerPoolHelper.stats.pendingTasks);
-      },
-      message: (payload) => {
-        if (payload.type === "memory_usage") {
-          console.log(
-            `Worker \`${payload.threadId}\` memory usage update delay(${payload.delay}) => `,
-            payload.data
-          );
-          console.log(
-            `Worker \`${payload.threadId}\` pool metrics`,
-            WorkerPoolHelper.stats
-          );
-        }
-      },
-    },
+if (cluster.isPrimary) {
+  console.log(`Master ${process.pid} is running`);
+
+  setupPrimary();
+
+  // // web config
+  // cluster.setupPrimary({
+  //   exec: "./dist/test-server/webWorker.js",
+  //   args: ["--use", "https"],
+  // });
+
+  // // add web worker
+  // ecosystemMap.addWebWorker(cluster.fork());
+  // ecosystemMap.addWebWorker(cluster.fork());
+
+  // socket server config
+  cluster.setupPrimary({
+    exec: "./dist/test-server/socketWorker.js",
+    args: ["--use", "http"],
   });
 
-  WorkerHelper.init({
-    filePath: "./dist/test-server/soloWorker.js",
-    options: {
-      workerData: {
-        name: "Master chief",
-      },
-    },
-    registeredEvents: {
-      message: function (payload) {
-        if (payload.type === "new_task") {
-          WorkerPoolHelper.pendingTasks.push(payload.data);
-          console.log("added result", WorkerPoolHelper.pendingTasks.length, payload.data);
-        }
-      },
-    },
+  // add socket server config
+  ecosystemMap.addSocketWorker(cluster.fork());
+  ecosystemMap.addSocketWorker(cluster.fork());
+  ecosystemMap.addSocketWorker(cluster.fork());
+  ecosystemMap.addSocketWorker(cluster.fork());
+  ecosystemMap.addSocketWorker(cluster.fork());
+
+  /**
+   * Watch worker exit
+   */
+  cluster.on("exit", (worker) => {
+    console.log(`Worker ${worker.process.pid} died`);
+    const workerType = ecosystemMap.getWorkerType(worker.id);
+
+    switch (workerType) {
+      case "socket":
+        // socket server config
+        cluster.setupPrimary({
+          exec: "./dist/test-server/socketWorker.js",
+          args: ["--use", "http"],
+        });
+
+        // add socket server config
+        ecosystemMap.addSocketWorker(cluster.fork());
+        break;
+
+      case "web":
+        // web config
+        cluster.setupPrimary({
+          exec: "./dist/test-server/webWorker.js",
+          args: ["--use", "https"],
+        });
+
+        // add web worker
+        ecosystemMap.addWebWorker(cluster.fork());
+        break;
+    }
   });
-
-  // console.log("is master", isMainThread);
-  // console.log("stats", WorkerPoolHelper.stats);
-});
-
-bootstrap.beforeStart(async (app) => {
-  console.log("before start");
-});
-
-bootstrap.beforeInit(async (app) => {
-  console.log("before init");
-
-  bootstrap.updateInitConfig({
-    appName: "Test Server API",
-    forceHttps: false,
-  });
-});
-
-bootstrap.beforeServerListening(async (server) => {
-  console.log("Before server.listen....");
-});
-
-/**
- * Start your app
- */
-bootstrap.start();
+} else {
+  // hey
+}
