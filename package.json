@@ -43,9 +43,12 @@
     "tslint": "^5.20.1",
     "typescript": "^4.4.3"
   },
+  "overrides": {
+    "colors": "1.4.0"
+  },
   "dependencies": {
     "body-parser": "^1.19.0",
-    "colors": "^1.4.0",
+    "colors": "1.4.0",
     "cors": "^2.8.5",
     "helmet": "^3.23.3",
     "mailgen": "^2.0.13",
