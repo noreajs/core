@@ -35,7 +35,7 @@
     "@types/express-session": "^1.17.0",
     "@types/helmet": "0.0.47",
     "@types/mailgen": "^2.0.5",
-    "@types/node": "^16.9.1",
+    "@types/node": "^16.11.21",
     "@types/numeral": "^2.0.1",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
