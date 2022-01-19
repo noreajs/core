@@ -1,4 +1,4 @@
-export { LocalWorkerPoolHelper, Logger, WorkerHelper } from "./helpers";
+export { LocalWorkerPoolHelper, Logger, WorkerHelper, HttpStatus  } from "./helpers";
 export {
   AfterStartFunctionType,
   AppRoutesInitParamsType,
