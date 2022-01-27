@@ -133,9 +133,9 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
       const {
         app,
         afterStart,
-        beforeServerListening,
-        beforeStart,
         beforeInit,
+        beforeStart,
+        beforeServerListening,
         ...initRest
       } = this.init;
       this.init = {
@@ -144,6 +144,7 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
         beforeInit,
         beforeStart,
         beforeServerListening,
+        bodyParser: setting.bodyParser ?? initRest.bodyParser,
         bodyParserJsonOptions:
           setting.bodyParserJsonOptions ?? initRest.bodyParserJsonOptions,
         bodyParserUrlEncodedOptions:
@@ -257,16 +258,26 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
       }
 
       // support application/json type post data
-      this.app.use(json(this.init.bodyParserJsonOptions) as any);
+      if (
+        this.init.bodyParser?.json === true ||
+        this.init.bodyParser?.json === undefined
+      ) {
+        this.app.use(json({}) as any);
+      } else if (this.init.bodyParser?.json) {
+        this.app.use(json(this.init.bodyParser?.json) as any);
+      }
 
       //support application/x-www-form-urlencoded post data
-      if (this.init.bodyParserUrlEncodedOptions) {
-        const { extended, ...rest } = this.init.bodyParserUrlEncodedOptions;
+      if (
+        this.init.bodyParser?.urlEncoded === true ||
+        this.init.bodyParser?.urlEncoded === undefined
+      ) {
+        this.app.use(urlencoded({ extended: false }) as any);
+      } else if (this.init.bodyParser?.urlEncoded) {
+        const { extended, ...rest } = this.init.bodyParser.urlEncoded;
         this.app.use(
           urlencoded({ extended: extended ?? false, ...rest }) as any
         );
-      } else {
-        this.app.use(urlencoded({ extended: false }) as any);
       }
 
       // express session

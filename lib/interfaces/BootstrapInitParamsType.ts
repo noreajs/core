@@ -136,14 +136,34 @@ declare type BootstrapInitParamsType<T> = {
   corsOptions?: cors.CorsOptions | cors.CorsOptionsDelegate;
 
   /**
+   * Body parser
+   * https://www.npmjs.com/package/body-parser
+   */
+  bodyParser?: {
+    /**
+     * json options
+     */
+    json?: boolean | bodyParser.OptionsJson;
+
+    /**
+     * URL encoded options
+     */
+    urlEncoded?: boolean | bodyParser.OptionsUrlencoded;
+  };
+
+  /**
    * Body parser json options
    * https://www.npmjs.com/package/body-parser
+   *
+   *  @deprecated Use `bodyParser.json` instead
    */
   bodyParserJsonOptions?: bodyParser.OptionsJson;
 
   /**
    * Body parser URL encoded options
    * https://www.npmjs.com/package/body-parser
+   *
+   * @deprecated Use `bodyParser.urlEncoded` instead
    */
   bodyParserUrlEncodedOptions?: bodyParser.OptionsUrlencoded;
 
