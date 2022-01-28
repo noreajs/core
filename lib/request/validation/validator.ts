@@ -191,9 +191,9 @@ export namespace Validator {
        */
 
       // is empty or not defined
-      const isEmpty = value === null || value === undefined;
+      const isFilled = value !== null && value !== undefined;
 
-      if (isRequired) {
+      if (isRequired || isFilled) {
         const typeErrorMessage = Array.isArray(def.type)
           ? def.type[1]
           : `The value of \`${
