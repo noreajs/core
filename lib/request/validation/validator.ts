@@ -244,7 +244,7 @@ export namespace Validator {
                     origin,
                     def.validator,
                     result,
-                    `${prefix}.${field}.${index}`
+                    prefix ? `${prefix}.${field}.${index}` : `${field}.${index}`
                   );
                 }
               }
