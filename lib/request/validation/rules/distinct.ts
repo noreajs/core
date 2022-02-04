@@ -1,11 +1,11 @@
 import { isFilled } from "../helpers";
 import { Validator } from "../validator";
 
-export type DistinctRuleOptionsType = {
+export type DistinctRuleOptionsType<T = any> = {
   /**
    * When item type is not a string or a number, this function will be use to convert to string
    */
-  toString?: (value: any) => string;
+  toString?: (value: T) => string;
 
   /**
    * Custom error message
@@ -18,9 +18,9 @@ export type DistinctRuleOptionsType = {
  * @param {DistinctRuleOptionsType} options
  * @returns Validator.RuleType
  */
-const distinctRule = (
-  options?: DistinctRuleOptionsType
-): Validator.RuleType => {
+function distinctRule<T = any>(
+  options?: DistinctRuleOptionsType<T>
+): Validator.RuleType {
   return {
     message: (value, field, _origin, def, data) => {
       // load type
@@ -43,7 +43,7 @@ const distinctRule = (
          * @param o object
          * @returns object
          */
-        function sortObject(o) {
+        function sortObject(o): any {
           let sorted = {},
             key,
             a = [];
@@ -124,6 +124,6 @@ const distinctRule = (
       }
     },
   };
-};
+}
 
 export default distinctRule;
