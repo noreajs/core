@@ -13,6 +13,7 @@ import afterFieldsRule from "./afterFields";
 import beforeFieldsRule from "./beforeFields";
 import afterDateRule from "./afterDate";
 import beforeDateRule from "./beforeDate";
+import distinctRule from "./distinct";
 
 export namespace Rule {
   export const among = amongRule;
@@ -30,4 +31,5 @@ export namespace Rule {
   export const beforeFields = beforeFieldsRule;
   export const afterDate = afterDateRule;
   export const beforeDate = beforeDateRule;
+  export const distinct = distinctRule;
 }

@@ -3,6 +3,7 @@ import { Rule } from "../request/validation/rules/Rule";
 import { Validator } from "../request/validation/validator";
 import AppRoutes from "../route/AppRoutes";
 import moment from "moment";
+import { HttpStatus } from "..";
 
 export default new AppRoutes({
   routes: (app) => {
@@ -43,6 +44,33 @@ export default new AppRoutes({
         module.route("/email").get((req: Request, res: Response) => {
           // send email
         });
+
+        /**
+         * Rule.distinct test
+         */
+        module.route("/distinct-test").post([
+          Validator.validateRequest("body", {
+            tags: {
+              type: "array",
+              required: true,
+              rules: [
+                Rule.distinct({
+                  toString: (value) => {
+                    return JSON.stringify(value);
+                  },
+                }),
+              ],
+            },
+            names: {
+              type: "string",
+              required: true,
+              rules: [Rule.distinct()],
+            },
+          }),
+          (req: Request, res: Response) => {
+            return res.status(HttpStatus.Ok).json(req.body);
+          },
+        ]);
 
         module.group("/projects", {
           routes: (r) => {

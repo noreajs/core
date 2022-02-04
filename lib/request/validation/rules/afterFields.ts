@@ -1,4 +1,4 @@
-import moment, { relativeTimeRounding } from "moment";
+import moment from "moment";
 import { isFilled } from "../helpers";
 import { Validator } from "../validator";
 
