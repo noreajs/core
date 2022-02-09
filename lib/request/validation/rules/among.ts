@@ -62,7 +62,6 @@ const amongRule = (list: (string | number)[]): Validator.RuleType => {
       },
     };
   } else {
-    // don't want to loose any time for no reason
     return {
       message: undefined,
       validator: () => {
