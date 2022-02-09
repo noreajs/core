@@ -464,42 +464,45 @@ export namespace Validator {
        * Rules validation
        */
       for (const rule of def.rules ?? []) {
-        // define the error message
-        let errorMessage = rule.message
-          ? typeof rule.message === "string"
-            ? rule.message
-            : await rule.message(
-                value,
-                prefix ? `${prefix}.${field}` : field,
-                origin,
-                def,
-                data,
-                request
-              )
-          : `\`${prefix ? `${prefix}.${field}` : field}\` value is not valid`;
+        // making sure the rule is defined
+        if (rule !== null && rule !== undefined) {
+          // define the error message
+          let errorMessage = rule.message
+            ? typeof rule.message === "string"
+              ? rule.message
+              : await rule.message(
+                  value,
+                  prefix ? `${prefix}.${field}` : field,
+                  origin,
+                  def,
+                  data,
+                  request
+                )
+            : `\`${prefix ? `${prefix}.${field}` : field}\` value is not valid`;
 
-        // validation result
-        const result = await rule.validator(
-          value,
-          prefix ? `${prefix}.${field}` : field,
-          origin,
-          def,
-          data,
-          request
-        );
-
-        // validation fails
-        if (typeof result === "string" || result === false) {
-          addError({
-            origin,
-            field: prefix ? `${prefix}.${field}` : field,
-            type: fieldType,
+          // validation result
+          const result = await rule.validator(
             value,
-            message: [typeof result === "string" ? result : errorMessage],
-          });
+            prefix ? `${prefix}.${field}` : field,
+            origin,
+            def,
+            data,
+            request
+          );
 
-          // stop progression after the first error
-          break;
+          // validation fails
+          if (typeof result === "string" || result === false) {
+            addError({
+              origin,
+              field: prefix ? `${prefix}.${field}` : field,
+              type: fieldType,
+              value,
+              message: [typeof result === "string" ? result : errorMessage],
+            });
+
+            // stop progression after the first error
+            break;
+          }
         }
       }
     }

@@ -54,7 +54,12 @@ const notAmongRule = (list: (string | number)[]): Validator.RuleType => {
       },
     };
   } else {
-    return undefined;
+    return {
+      message: undefined,
+      validator: () => {
+        return true;
+      },
+    };
   }
 };
 
