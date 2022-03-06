@@ -14,10 +14,14 @@ import beforeFieldsRule from "./beforeFields";
 import afterDateRule from "./afterDate";
 import beforeDateRule from "./beforeDate";
 import distinctRule from "./distinct";
+import numberItemMinRule from "./numberItemMin";
+import numberItemMaxRule from "./numberItemMax";
 
 export namespace Rule {
   export const among = amongRule;
   export const min = minRule;
+  export const numberItemMin = numberItemMinRule;
+  export const numberItemMax = numberItemMaxRule;
   export const max = maxRule;
   export const notAmong = notAmongRule;
   export const valueRequired = requiredRule;
