@@ -15,6 +15,7 @@ export default abstract class IEmailNotification<
 > {
   protected mailGenerator: Mailgen;
   protected transport!: TransportType;
+  private initialGeneratorOption: Mailgen.Option;
 
   email: Partial<Emails> = {};
 
@@ -25,6 +26,7 @@ export default abstract class IEmailNotification<
       MailDataType
     >
   ) {
+    this.initialGeneratorOption = params.generator;
     this.mailGenerator = new Mailgen(params.generator);
 
     this.initTransport();
@@ -40,11 +42,20 @@ export default abstract class IEmailNotification<
    * @param mailContent Mail content
    */
   mail(
-    mailContent: Mailgen.Content
+    mailContent: Mailgen.Content,
+    generator?: Mailgen.Option
   ): {
     text: string;
     html: string;
   } {
+    // overwrite if custom mail config added
+    if (generator) {
+      this.mailGenerator = new Mailgen({
+        ...this.initialGeneratorOption,
+        ...generator,
+      });
+    }
+
     return {
       text: this.mailGenerator.generatePlaintext(mailContent),
       html: this.mailGenerator.generate(mailContent),
