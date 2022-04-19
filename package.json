@@ -39,7 +39,7 @@
     "@types/numeral": "^2.0.1",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
-    "mailgen": "^2.0.16",
+    "mailgen": "^2.0.22",
     "moment": "^2.29.1",
     "tslint": "^5.20.1",
     "typescript": "^4.4.3"
