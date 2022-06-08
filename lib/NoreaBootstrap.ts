@@ -161,7 +161,7 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
        */
       this.app.appName = setting.appName ?? initRest.appName ?? app?.appName;
       this.app.secretKey =
-        setting.appName ?? initRest.appName ?? app?.secretKey;
+        setting.secretKey ?? initRest.secretKey ?? app?.secretKey;
     }
   }
 
