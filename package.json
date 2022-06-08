@@ -8,6 +8,7 @@
     "dist"
   ],
   "scripts": {
+    "prepublish": "npx tsc",
     "start": "tsc && node dist/test-server/run.js",
     "test": "echo \"No test specified\""
   },
