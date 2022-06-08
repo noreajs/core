@@ -36,7 +36,7 @@ class ExpressParser {
     if (attributes) {
       parsed.appName = attributes.appName;
       parsed.secretKey =
-        attributes.appName ?? crypto.randomBytes(25).toString("hex");
+        attributes.secretKey ?? crypto.randomBytes(25).toString("hex");
     }
 
     return parsed;
