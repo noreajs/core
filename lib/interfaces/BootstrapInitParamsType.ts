@@ -49,10 +49,9 @@ declare type BootstrapInitParamsType<T> = {
    * Called before the server starts listening
    *
    * @param {http.Server | https.Server} server - The current server
+   * @param {NoreaApplication} server - The current server
    */
-  beforeServerListening?: BeforeServerListeningFunctionType<
-    http.Server | https.Server
-  >;
+  beforeServerListening?: BeforeServerListeningFunctionType<NoreaApplication>;
 
   /**
    * This method is executed during the initialization of the application (extension of express application).

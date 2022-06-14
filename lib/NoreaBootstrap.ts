@@ -92,7 +92,7 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
    * @param {BeforeServerListeningFunctionType<T>} callback
    */
   beforeServerListening(
-    callback: BeforeServerListeningFunctionType<Server | http.Server>
+    callback: BeforeServerListeningFunctionType<NoreaApplication>
   ): void {
     /**
      * App started
@@ -373,8 +373,11 @@ export class NoreaBootstrap implements INoreaBootstrap<NoreaApplication> {
       // new server instance
       const server = new defaultServer(this.app);
 
+      // Listen to check expectation
+      server.on("checkExpectation", this.app);
+
       // running required code before start listening the server
-      await this.init.beforeServerListening?.(server);
+      await this.init.beforeServerListening?.(server, this.app);
 
       // Start app
       await server.listen(this.appPort, async () => {

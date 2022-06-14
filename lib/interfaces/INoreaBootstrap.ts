@@ -1,10 +1,12 @@
 import BootstrapInitParamsType from "./BootstrapInitParamsType";
 import http from "http";
 import https from "https";
+import NoreaApplication from "./NoreaApplication";
 
 export type BeforeInitFunctionType<T> = (app: T) => void | Promise<void>;
 export type BeforeServerListeningFunctionType<T> = (
-  server: T
+  server: https.Server | http.Server,
+  app: T
 ) => void | Promise<void>;
 export type BeforeStartFunctionType<T> = (app: T) => void | Promise<void>;
 export type AfterStartFunctionType<T> = (
@@ -37,7 +39,7 @@ export default interface INoreaBootstrap<T> {
    * @param {BeforeServerListeningFunctionType<T>} callback
    */
   beforeServerListening(
-    callback: BeforeServerListeningFunctionType<http.Server | https.Server>
+    callback: BeforeServerListeningFunctionType<NoreaApplication>
   ): void;
 
   /**
