@@ -1,12 +1,11 @@
 import { json, urlencoded } from "body-parser";
+import cluster from "cluster";
 import colors from "colors";
 import cors from "cors";
 import express from "express";
 import session from "express-session";
 import helmet from "helmet";
 import { default as http, default as https } from "http";
-import { Server } from "https";
-import cluster from "cluster";
 import { cpus } from "os";
 import ExpressParser from "./helpers/ExpressParser";
 import {
@@ -14,7 +13,7 @@ import {
   BeforeInitFunctionType,
   BeforeStartFunctionType,
   INoreaBootstrap,
-  NoreaApplication,
+  NoreaApplication
 } from "./interfaces";
 import BootstrapInitMethods from "./interfaces/BootstrapInitParamsType";
 import { BeforeServerListeningFunctionType } from "./interfaces/INoreaBootstrap";

@@ -102,9 +102,10 @@ export default class EcosystemMap<T = string> {
    * @param settings cluster settings
    */
   addWorker(scope: T, settings?: ClusterSettings) {
-    if (this.workerCount >= cpus().length - 1) {
+    const cpusCount = cpus().length;
+    if (this.workerCount >= cpusCount) {
       Logger.log(
-        `cpus limit crossed: ${this.workerCount}/${cpus().length - 1} created`
+        `cpus limit crossed: ${this.workerCount}/${cpusCount} created`
       );
     } else {
       if (settings) {
