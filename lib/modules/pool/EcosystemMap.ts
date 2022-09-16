@@ -1,4 +1,4 @@
-import cluster, { Worker, ClusterSettings } from "cluster";
+import cluster, { ClusterSettings, Worker } from "cluster";
 import { cpus } from "os";
 import { WorkerPoolHelperEventType, WorkerPoolInstanceStatus } from ".";
 import { Logger } from "../..";
@@ -103,40 +103,42 @@ export default class EcosystemMap<T = string> {
    */
   addWorker(scope: T, settings?: ClusterSettings) {
     const cpusCount = cpus().length;
+
     if (this.workerCount >= cpusCount) {
       Logger.log(
         `cpus limit crossed: ${this.workerCount}/${cpusCount} created`
       );
-    } else {
-      if (settings) {
-        this._scopes[scope as any] = {
-          clusterSettings: settings,
-        };
-      }
-      const scopeOptions = this._scopes[scope as any];
+    }
 
-      if (scopeOptions) {
-        if (scopeOptions.clusterSettings) {
-          // setup default cluster setting
-          cluster.setupPrimary(scopeOptions.clusterSettings);
-          // create worker
-          const worker = cluster.fork();
-          // add worker
-          if (this._workers[scope as any]) {
-            this._workers[scope as any][worker.id] = worker;
-          } else {
-            this._workers[scope as any] = {};
-            this._workers[scope as any][worker.id] = worker;
-          }
-        }
-      } else {
-        // init scope
-        this._scopes[scope as any] = {};
+    if (settings) {
+      this._scopes[scope as any] = {
+        clusterSettings: settings,
+      };
+    }
+
+    const scopeOptions = this._scopes[scope as any];
+
+    if (scopeOptions) {
+      if (scopeOptions.clusterSettings) {
+        // setup default cluster setting
+        cluster.setupPrimary(scopeOptions.clusterSettings);
         // create worker
         const worker = cluster.fork();
         // add worker
-        this._workers[scope as any][worker.id] = worker;
+        if (this._workers[scope as any]) {
+          this._workers[scope as any][worker.id] = worker;
+        } else {
+          this._workers[scope as any] = {};
+          this._workers[scope as any][worker.id] = worker;
+        }
       }
+    } else {
+      // init scope
+      this._scopes[scope as any] = {};
+      // create worker
+      const worker = cluster.fork();
+      // add worker
+      this._workers[scope as any][worker.id] = worker;
     }
   }
 
