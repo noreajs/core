@@ -45,7 +45,7 @@ bootstrap.afterStart((app, server) => {
     },
   } as any);
 
-  socketIoServer.getServer().adapter(createAdapter());
+  socketIoServer.getServer().adapter(createAdapter() as any);
 
   setInterval(() => {
     try {
