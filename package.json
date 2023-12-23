@@ -4,6 +4,9 @@
   "description": "Norea.Js is a sets of tools for the development of API with Node.Js.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=18"
+  },
   "files": [
     "dist"
   ],
