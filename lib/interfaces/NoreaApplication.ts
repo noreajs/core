@@ -1,7 +1,7 @@
-import { Application } from "express";
+import { Application, RouteParameters, ParamsDictionary } from "express-serve-static-core";
 import RouteGroupParamsType from "./RouteGroupParamsType";
 
-interface NoreaApplication extends Application {
+interface NoreaApplication<RouterParams = ParamsDictionary> extends Application {
   /**
    * App name
    */
@@ -18,7 +18,10 @@ interface NoreaApplication extends Application {
    * @param params group params
    */
   group(params: RouteGroupParamsType): NoreaApplication;
-  group(prefix: string, params: RouteGroupParamsType): NoreaApplication;
+  group<
+    Route extends string,
+    P extends ParamsDictionary = RouterParams & RouteParameters<Route>
+  >(prefix: Route, params: RouteGroupParamsType<P>): NoreaApplication<P>;
 }
 
 export default NoreaApplication;

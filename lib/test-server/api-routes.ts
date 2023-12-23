@@ -4,18 +4,44 @@ import { Validator } from "../request/validation/validator";
 import AppRoutes from "../route/AppRoutes";
 import moment from "moment";
 import { HttpStatus } from "..";
+import { Router } from "express";
 
-export default new AppRoutes({
+const rt = Router({ mergeParams: true });
+
+rt.get('/test/:facebookId', (req, res) => {
+
+})
+
+const appRoutes = new AppRoutes({
   routes: (app) => {
-    app.group("/api/v1", {
+    app.group("/api/:version", {
       middlewares: [
-        // (req: Request, res: Response, next: Function) => {
-        //   return res.status(401).json({
-        //     message: "You are not allowed to access to this service",
-        //   });
-        // },
+        (req, res, next: Function) => {
+          return res.status(401).json({
+            message: "You are not allowed to access to this service",
+          });
+        },
       ],
       routes: (module) => {
+        module.get("/:id", (req) => {
+        })
+        /**
+         * Login
+         */
+        module.route("/login/:userId").get(async (req, res) => {
+          // throw "hello world.. Fuck you";
+          // await new Promise((resolve, rejct) => {
+          //   setTimeout(() => {
+          //     resolve(true);
+          //   }, Math.round(Math.random() * 10 * 1000));
+          // });
+          return res.status(200).send({
+            message: "Login",
+            workerId: process.pid,
+            params: req.params
+          });
+        });
+
         /**
          * Login
          */
@@ -164,3 +190,5 @@ export default new AppRoutes({
   },
   middlewares: (app) => void {},
 });
+
+export default appRoutes;

@@ -1,10 +1,11 @@
-import { RequestHandler, RouterOptions } from "express";
+import { RequestHandler, ParamsDictionary } from "express-serve-static-core";
+import { RouterOptions } from "express"
 import NoreaRouter from "./NoreaRouter";
 
-declare type RouteGroupParamsType = {
+export default interface RouteGroupParamsType<
+  P extends ParamsDictionary = ParamsDictionary
+> {
   routerOptions?: RouterOptions;
-  middlewares?: RequestHandler[];
-  routes: (router: NoreaRouter) => void;
+  middlewares?: RequestHandler<P>[];
+  routes: (router: NoreaRouter<P>) => void;
 };
-
-export default RouteGroupParamsType;

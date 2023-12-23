@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import NoreaRouter from "../interfaces/NoreaRouter";
 import { routerGroup, applicationGroup } from "../route/group";
-import { Application, Router } from "express";
+import { Application, Router } from "express-serve-static-core";
 import NoreaApplication from "../interfaces/NoreaApplication";
 
 class ExpressParser {
